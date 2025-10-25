@@ -1,5 +1,5 @@
 ---
-title: XV6-2020: LAB3-PGTBL
+title: "XV6-2020: LAB3-PGTBL"
 published: 2025-06-07
 description: "最离谱的守门BOSS"
 image: "./lab3.jpg"

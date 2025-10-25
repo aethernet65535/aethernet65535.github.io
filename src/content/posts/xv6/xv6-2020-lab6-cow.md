@@ -1,5 +1,5 @@
 ---
-title: XV6-2020: LAB6-COW
+title: "XV6-2020: LAB6-COW"
 published: 2025-06-25
 description: "怎么操作系统还有牛牛？"
 image: "./lab6.jpg"

@@ -1,5 +1,5 @@
 ---
-title: XV6-2020: LAB1-UTIL
+title: "XV6-2020: LAB1-UTIL"
 published: 2025-06-04
 description: "开始游玩XV6吧"
 image: "./lab1.jpg"

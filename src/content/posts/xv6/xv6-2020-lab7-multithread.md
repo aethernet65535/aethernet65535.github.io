@@ -1,5 +1,5 @@
 ---
-title: XV6-2020: LAB7-MULTITHREADING
+title: "XV6-2020: LAB7-MULTITHREADING"
 published: 2025-06-28
 description: "多线程真奇妙呀...等等这还是xv6吗！？"
 image: "./lab7.jpg"

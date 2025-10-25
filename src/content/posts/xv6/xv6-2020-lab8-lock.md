@@ -1,5 +1,5 @@
 ---
-title: XV6-2020: LAB8-LOCK
+title: "XV6-2020: LAB8-LOCK"
 published: 2025-07-06
 description: "锁住资源！"
 image: "./lab8.jpg"

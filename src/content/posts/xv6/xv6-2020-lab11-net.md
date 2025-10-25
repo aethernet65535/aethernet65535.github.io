@@ -1,5 +1,5 @@
 ---
-title: XV6-2020: LAB11-NET
+title: "XV6-2020: LAB11-NET"
 published: 2025-08-30
 description: "游戏结束"
 image: "./lab11.png"

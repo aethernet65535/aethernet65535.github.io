@@ -1,5 +1,5 @@
 ---
-title: 小对象分配与释放：kmalloc()/kfree()
+title: "小对象分配与释放：kmalloc()/kfree()"
 published: 2025-10-24
 description: "开始学习Linux内存管理吧"
 image: "./kmalloc.png"

@@ -1,5 +1,5 @@
 ---
-title: XV6-2020: LAB2-SYSCALL
+title: "XV6-2020: LAB2-SYSCALL"
 published: 2025-06-06
 description: "初步理解系统调用"
 image: "./lab2.jpg"

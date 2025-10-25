@@ -1,16 +1,5 @@
-+++
-title = "XV6-2020 LAB9-FILESYSTEM"
-date = 2025-07-21
-
-[taxonomies]
-tags = ["xv6"]
-
-[extra]
-comment = true
-+++
-
 ---
-title: XV6-2020: LAB9-FILESYSTEM
+title: "XV6-2020: LAB9-FILESYSTEM"
 published: 2025-07-21
 description: "今天是什么日子呢（笑）"
 image: "./lab9.jpg"

@@ -1,5 +1,5 @@
 ---
-title: XV6-2020: LAB10-MMAP
+title: "XV6-2020: LAB10-MMAP"
 published: 2025-08-26
 description: "这个比Linux的mmap简单多了"
 image: "./lab10.jpg"

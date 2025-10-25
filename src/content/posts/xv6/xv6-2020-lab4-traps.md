@@ -1,5 +1,5 @@
 ---
-title: XV6-2020: LAB4-TRAPS
+title: "XV6-2020: LAB4-TRAPS"
 published: 2025-06-15
 description: "初步理解陷阱"
 image: "./lab4.jpg"

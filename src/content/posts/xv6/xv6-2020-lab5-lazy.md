@@ -1,5 +1,5 @@
 ---
-title: XV6-2020: LAB5-LAZY
+title: "XV6-2020: LAB5-LAZY"
 published: 2025-06-21
 description: "懒惰点也可以"
 image: "./lab5.jpg"
