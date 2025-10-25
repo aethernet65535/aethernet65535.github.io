@@ -20,8 +20,8 @@ import { LinkPreset } from "./types/config";
 const SITE_LANG = "zh_CN"; // 语言代码，例如：'en', 'zh_CN', 'ja' 等。
 
 export const siteConfig: SiteConfig = {
-	title: "Mizuki",
-	subtitle: "One demo website",
+	title: "aethernet-blog",
+	subtitle: "text website",
 
 	lang: SITE_LANG,
 
@@ -286,7 +286,7 @@ export const navBarConfig: NavBarConfig = {
 };
 
 export const profileConfig: ProfileConfig = {
-	avatar: "assets/images/avatar.webp", // 相对于 /src 目录。如果以 '/' 开头，则相对于 /public 目录
+	avatar: "assets/images/profile_pic.png", // 相对于 /src 目录。如果以 '/' 开头，则相对于 /public 目录
 	name: "AetherNET",
 	bio: "休对故人思故国，且将新火试新茶。诗酒趁年华。",
 	typewriter: {
