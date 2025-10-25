@@ -2,15 +2,15 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
   <title>Mizuki</title>
   <subtitle>One demo website</subtitle>
-  <link href="https://mizuki.mysqil.com/" rel="alternate" type="text/html"/>
-  <link href="https://mizuki.mysqil.com/atom.xml" rel="self" type="application/atom+xml"/>
-  <id>https://mizuki.mysqil.com/</id>
-  <updated>2025-10-25T09:45:50.272Z</updated>
+  <link href="https://aethernet65535.github.io/" rel="alternate" type="text/html"/>
+  <link href="https://aethernet65535.github.io/atom.xml" rel="self" type="application/atom+xml"/>
+  <id>https://aethernet65535.github.io/</id>
+  <updated>2025-10-25T09:59:46.209Z</updated>
   <language>en</language>
   <entry>
     <title>Markdown Tutorial</title>
-    <link href="https://mizuki.mysqil.com/posts/markdown-tutorial/" rel="alternate" type="text/html"/>
-    <id>https://mizuki.mysqil.com/posts/markdown-tutorial/</id>
+    <link href="https://aethernet65535.github.io/posts/markdown-tutorial/" rel="alternate" type="text/html"/>
+    <id>https://aethernet65535.github.io/posts/markdown-tutorial/</id>
     <published>2025-01-20T00:00:00.000Z</published>
     <updated>2025-01-20T00:00:00.000Z</updated>
     <summary>A simple example of a Markdown blog post.</summary>
@@ -732,8 +732,8 @@ This is another regular paragraph.
   </entry>
   <entry>
     <title>Markdown Extended Features</title>
-    <link href="https://mizuki.mysqil.com/posts/markdown-extended/" rel="alternate" type="text/html"/>
-    <id>https://mizuki.mysqil.com/posts/markdown-extended/</id>
+    <link href="https://aethernet65535.github.io/posts/markdown-extended/" rel="alternate" type="text/html"/>
+    <id>https://aethernet65535.github.io/posts/markdown-extended/</id>
     <published>2024-05-01T00:00:00.000Z</published>
     <updated>2024-11-29T00:00:00.000Z</updated>
     <summary>Read more about Markdown features in Mizuki</summary>
@@ -801,8 +801,8 @@ This is a note with a custom title.
   </entry>
   <entry>
     <title>Simple Guides for Mizuki</title>
-    <link href="https://mizuki.mysqil.com/posts/guide/" rel="alternate" type="text/html"/>
-    <id>https://mizuki.mysqil.com/posts/guide/</id>
+    <link href="https://aethernet65535.github.io/posts/guide/" rel="alternate" type="text/html"/>
+    <id>https://aethernet65535.github.io/posts/guide/</id>
     <published>2024-04-01T00:00:00.000Z</published>
     <updated>2024-04-01T00:00:00.000Z</updated>
     <summary>How to use this blog template.</summary>
@@ -888,8 +888,8 @@ draft: false
   </entry>
   <entry>
     <title>Markdown Mermaid</title>
-    <link href="https://mizuki.mysqil.com/posts/markdown-mermaid/" rel="alternate" type="text/html"/>
-    <id>https://mizuki.mysqil.com/posts/markdown-mermaid/</id>
+    <link href="https://aethernet65535.github.io/posts/markdown-mermaid/" rel="alternate" type="text/html"/>
+    <id>https://aethernet65535.github.io/posts/markdown-mermaid/</id>
     <published>2023-10-01T00:00:00.000Z</published>
     <updated>2023-10-01T00:00:00.000Z</updated>
     <summary>A simple example of a Markdown blog post with Mermaid.</summary>
@@ -1052,8 +1052,8 @@ draft: false
   </entry>
   <entry>
     <title>Include Video in the Posts</title>
-    <link href="https://mizuki.mysqil.com/posts/video/" rel="alternate" type="text/html"/>
-    <id>https://mizuki.mysqil.com/posts/video/</id>
+    <link href="https://aethernet65535.github.io/posts/video/" rel="alternate" type="text/html"/>
+    <id>https://aethernet65535.github.io/posts/video/</id>
     <published>2022-08-01T00:00:00.000Z</published>
     <updated>2022-08-01T00:00:00.000Z</updated>
     <summary>This post demonstrates how to include embedded video in a blog post.</summary>
