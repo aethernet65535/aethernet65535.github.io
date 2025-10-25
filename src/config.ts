@@ -17,7 +17,7 @@ import { LinkPreset } from "./types/config";
 // 移除i18n导入以避免循环依赖
 
 // 定义站点语言
-const SITE_LANG = "en"; // 语言代码，例如：'en', 'zh_CN', 'ja' 等。
+const SITE_LANG = "zh_CN"; // 语言代码，例如：'en', 'zh_CN', 'ja' 等。
 
 export const siteConfig: SiteConfig = {
 	title: "Mizuki",
@@ -44,7 +44,7 @@ export const siteConfig: SiteConfig = {
 	// 顶栏标题配置
 	navbarTitle: {
 		// 顶栏标题文本
-		text: "MizukiUI",
+		text: "aethernet-blog",
 		// 顶栏标题图标路径，默认使用 public/assets/home/home.png
 		icon: "assets/home/home.png",
 	},
@@ -287,13 +287,14 @@ export const navBarConfig: NavBarConfig = {
 
 export const profileConfig: ProfileConfig = {
 	avatar: "assets/images/avatar.webp", // 相对于 /src 目录。如果以 '/' 开头，则相对于 /public 目录
-	name: "Matsuzaka Yuki",
-	bio: "The world is big, you have to go and see",
+	name: "AetherNET",
+	bio: "休对故人思故国，且将新火试新茶。诗酒趁年华。",
 	typewriter: {
 		enable: true, // 启用个人简介打字机效果
 		speed: 80, // 打字速度（毫秒）
 	},
 	links: [
+		/*
 		{
 			name: "Bilibli",
 			icon: "fa6-brands:bilibili",
@@ -304,11 +305,13 @@ export const profileConfig: ProfileConfig = {
 			icon: "mdi:git",
 			url: "https://gitee.com/matsuzakayuki",
 		},
+		*/
 		{
 			name: "GitHub",
 			icon: "fa6-brands:github",
-			url: "https://github.com/matsuzaka-yuki",
+			url: "https://github.com/aethernet65535",
 		},
+		/*
 		{
 			name: "Codeberg",
 			icon: "simple-icons:codeberg",
@@ -319,6 +322,7 @@ export const profileConfig: ProfileConfig = {
 			icon: "fa6-brands:discord",
 			url: "https://discord.gg/MqW6TcQtVM",
 		},
+		*/
 	],
 };
 
