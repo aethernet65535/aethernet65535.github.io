@@ -29,7 +29,7 @@ import { remarkReadingTime } from "./src/plugins/remark-reading-time.mjs";
 export default defineConfig({
 	site: "https://aethernet65535.github.io",
 
-	base: "/aethernet65535.github.io",
+	base: "/",
 	trailingSlash: "always",
 	integrations: [
 		tailwind({
