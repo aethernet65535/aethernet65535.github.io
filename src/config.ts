@@ -123,13 +123,13 @@ export const siteConfig: SiteConfig = {
 
 		homeText: {
 			enable: true, // 在主页显示自定义文本
-			title: "Beautiful Mizuki!", // 主页横幅主标题
+			title: "Linux Kernel", // 主页横幅主标题
 
 			subtitle: [
-				"A Showcase Demo Site",
-				"Carousel Highlight: Innovation",
-				"Carousel Focus: User Experience",
-				"Carousel Spot: Core Advantages",
+				"Memory Management...",
+				"SLAB...",
+				"Buddy...",
+				"Page...",
 			],
 			typewriter: {
 				enable: true, // 启用副标题打字机效果
