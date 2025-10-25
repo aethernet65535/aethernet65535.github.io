@@ -1,1 +1,0 @@
-import"./config.BNwZDY95.js";import"./zh_TW.Jbo5k0IW.js";function s(t,e){const o=t.replace(/^\/|\/$/g,"").toLowerCase(),n=e.replace(/^\/|\/$/g,"").toLowerCase();return o===n}function r(...t){return t.join("/").replace(/\/+/g,"/")}function c(t){return a(`/posts/${t}/`)}function a(t){return r("","/aethernet65535.github.io/",t)}export{c as g,s as p,a as u};
