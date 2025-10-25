@@ -460,8 +460,68 @@ s->cpu_slab->tid = next_tid(tid);
 `maybe_wipe_obj_freeptr()`： 这个就是在我们把对象分配出去之前，把`next_object`那里清理一下，以免调用方跑去访问那里结果不小心Kernel Panic。
 `if (unlikely(slab_want_init_on_alloc(gfpflags, s)) && object)`： 这个放`unlikely`我还挺惊讶的，因为如果我们使用`kzalloc()`的话，这里就是负责清零的地方，可能是因为Linux认为开发者一般不会选择清零这种昂贵操作，所以就`unlikely`吧...
 
+## kmalloc_large
+好，现在来看一下`kmalloc_large()`，差点忘了这个函数。
+```C
+static __always_inline void *kmalloc_large(size_t size, gfp_t flags)
+{
+ unsigned int order = get_order(size);
+ return kmalloc_order_trace(size, flags, order);
+}
+```
+有trace的基本就是调试的意思，不过这里不能跳过了，跳了就没东西看了。
+
+```C
+#ifdef CONFIG_TRACING
+void *kmalloc_order_trace(size_t size, gfp_t flags, unsigned int order)
+{
+ void *ret = kmalloc_order(size, flags, order);
+ trace_kmalloc(_RET_IP_, ret, size, PAGE_SIZE << order, flags);
+ return ret;
+}
+EXPORT_SYMBOL(kmalloc_order_trace);
+#endif
+```
+好，这里我想读者们都看得懂，就是返回值要从一个名为`kmalloc_order()`的函数获取，理解这个就好了。
+
+```C
+void *kmalloc_order(size_t size, gfp_t flags, unsigned int order)
+{
+ void *ret = NULL;
+ struct page *page;
+
+ if (unlikely(flags & GFP_SLAB_BUG_MASK))
+  flags = kmalloc_fix_flags(flags);
+```
+博主也看不懂`GFP_SLAB_BUG_MASK`是什么，不过会有一个函数帮我们修复标志，所以放心好了。
+
+```C
+ flags |= __GFP_COMP;
+```
+这个是复合页的意思，就是告诉Buddy分配器说“要把页合在一起”，而不是排在一起而已，如果有`__GFP_COMP`的话内核就能找到头页在哪。
+
+```C
+ page = alloc_pages(flags, order);
+ if (likely(page)) {
+  ret = page_address(page);
+  mod_lruvec_page_state(page, NR_SLAB_UNRECLAIMABLE_B,
+          PAGE_SIZE << order);
+ }
+```
+这里就是从Buddy分配一个页，但是这个页不是我们平常用的那种，而是一个页管理结构体，我们需要把结构体转换为虚拟地址，也就是`page_address()`，这样我们就获得了一个我们平常使用的虚拟地址了。
+
+```C
+ ret = kasan_kmalloc_large(ret, size, flags);
+ /* As ret might get tagged, call kmemleak hook after KASAN. */
+ kmemleak_alloc(ret, size, 1, flags);
+ return ret;
+}
+EXPORT_SYMBOL(kmalloc_order);
+```
+这些基本都是调试了，博主就不多说了，该看`kfree()`了。
+
 # 总结
 今天就先这样吧...博主好累了捏，明天继续更新这篇博客，加上`kfree()`的实现。
 继续熬的话就要早上了...（倒下）不过现在这时间点是真的安静呀！
 
-最后编辑时间：2025/10/25 AM03:33
+最后编辑时间：2025/10/26 AM06:33
