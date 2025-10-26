@@ -9,6 +9,8 @@ draft: false
 ---
 
 # 前言
+注意：这是博主在学习过程中的理解笔记，可能包含简化或未深入探讨的部分。随着对内核理解的加深，可能会持续更新更准确的内容！
+
 好久没写博客了，回来写写练练手。
 提醒：由于博客比较乱，推荐读者用另一台显示器/设备准备完整的源代码搭配博客食用。
 可以用这个网站：https://elixir.bootlin.com/linux/v5.10.245/source/mm/
@@ -638,7 +640,7 @@ redo:
 ```
 这个还算是好理解的，进入的条件是，如果我们要释放的对象位于该CPU的缓存中。
 接下来，博主来解释一下一些函数：
-`set_freepointer(s, tail_obj, freelist)`：让`tail_obj`（要释放的对象）指向`freelist`（也就是第一个空对象）。虽然在SLUB更复杂，不过读者们可以先暂时这样理解。
+`set_freepointer(s, tail_obj, freelist)`：让`tail_obj`（要释放的对象）的FREE POINTER指向`freelist`（也就是第一个空对象）。
 `this_cpu_cmpxchg_double()`： 这个刚刚解释过咯，可以翻到`kmalloc()`节看看。
 
 ```C
@@ -648,6 +650,60 @@ redo:
 }
 ```
 这个就是个比较通用的路径，也叫做慢路径，刚刚的就叫做快路径。
+
+### 快路径
+我们先看比较理想化的吧，因为这种一般没有太多判断，而且比较容易触发。
+
+```C
+static inline void set_freepointer(struct kmem_cache *s, void *object, void *fp)
+{
+	unsigned long freeptr_addr = (unsigned long)object + s->offset;
+```
+这个刚刚我们也见到了，就是每个对象的FREE POINTER位置都是相对固定的，只要加上对应的偏移量就能找到了，只是我们在分配的时候释放掉了FREE POINTER。
+
+```C
+	*(void **)freeptr_addr = freelist_ptr(s, fp, freeptr_addr); /* void **freelist */
+}
+```
+这里最重要的就是`freelist_ptr()`了，可以先把他理解为获得一个**加密版本**的`freelist`。
+就是让`object`的FREE POINTER存储加密后的`freelist`地址！
+
+简单点说就是，让`object`的FREE POINTER指向`freelist`。（超级好理解吧哼哼）
+
+```C
+static inline void *freelist_ptr(const struct kmem_cache *s, void *ptr,
+				 unsigned long ptr_addr)
+{
+#ifdef CONFIG_SLAB_FREELIST_HARDENED
+	return (void *)((unsigned long)ptr ^ s->random ^
+			swab((unsigned long)kasan_reset_tag((void *)ptr_addr)));
+#else
+	return ptr;
+#endif
+}
+```
+这个`freelist_ptr()`是在实现FREE POINTER的混淆技术。
+当开启`CONFIG_SLAB_FREELIST_HARDENED`配置时，它会对FREE POINTER进行异或加密：
+- `s->random`是每个`kmem_cache`独有的随机数。
+- `ptr_addr`是存储这个指针的内存地址。
+- 通过**异或**操作把原始指针`ptr`加密存储。
+
+说实话我也没怎么看懂，所以...我们就当作它只会返回`ptr`吧？
+当然，是加密后的版本，毕竟直接返回`ptr`也行的话就代表这两个是通用的，不过在不同配置下不通用。
+
+#### 从`set_freepointer()`返回后 / 快路径的结束
+
+```C
+		if (unlikely(!this_cpu_cmpxchg_double(
+				s->cpu_slab->freelist, s->cpu_slab->tid,
+				freelist, tid,
+				head, next_tid(tid)))) {
+```
+返回后，就会执行这里，我们就默认它不会执行失败吧！
+如果执行成功了，最主要的作用就是`freelist`会把地址改为我们的这位小对象，而我们的小对象FREE POINTER在刚刚就已经指向上一个`freelist`了，所以不用担心哪个小对象会不见！
+
+其他的就不必管了，不是什么大问题。
+啊还有，要问如果失败会怎么样的话...首选会先记录，然后重来（`redo`），不过`redo`我们就不看了...
 
 # 总结
 还没完成，不过博主想睡觉了...（倒下）
