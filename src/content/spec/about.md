@@ -1,49 +1,29 @@
 
-This website is built with the **Astro** framework using the [Mizuki](https://github.com/matsuzaka-yuki/mizuki) theme.
+大家好，我是位刚开始学习编程的小白，学习的领域是Linux内核，目前感兴趣的是内存管理，其次是任务调度。
 
-::github{repo="matsuzaka-yuki/Mizuki"}
+# 为什么会对编程感兴趣 ( ╹ -╹)?
+有一天，博主回到家时，发现手机突然变得很烫，很卡，耗电还超级快，体验真的超级差。
+虽然重启能让这一问题消失一阵子，但是这总不是长久之计。
+于是博主就上网，开始去翻各大社区和群组，找找有没有这个手机的省电内核，结果发现完全没有呢。
 
-## 🌟 Theme Features
+博主就很不开心，虽然可以通过刷别的系统解决，但是换内核说不定也是一个可以提升续航的好方法。
+所以博主就想，“可不可以自己写一个内核呀？网上好像也不少，应该不难吧？”（现在知道了很难 QAQ）。
 
-### 🎨 Design & User Experience
-- **Modern & Elegant Design** - Clean, minimalist interface with beautiful typography
-- **Fully Responsive** - Optimized for all devices from mobile to desktop
-- **Dark/Light Mode** - Automatic theme switching with smooth transitions
-- **Beautiful Typography** - Enhanced readability with JetBrains Mono font
-- **Smooth Animations** - Fluid page transitions and interactive elements
+因为我知道安卓内核基本就是Linux内核的魔改版，所以就去找找Linux内核用什么语言写，发现大部分是C写的。
+所以博主就开始学C了，学好一些基本语法后发现有一个项目叫做XV6-RISCV，还有配套的实验，博主就很感兴趣，觉得是一个很好的操作系统入门机会呢！
+然后就开始学了，也做了LAB，虽然不完全是自己做，不过博主也有尽量让自己知道，自己在抄什么，抄了后能不能自己解释自己在做什么？
 
-### 🔍 Content & Search
-- **Advanced Search** - Powered by [Pagefind](https://pagefind.app/) for fast, accurate results
-- **Enhanced Markdown** - Extended syntax with code highlighting and math support
-- **Interactive Table of Contents** - Auto-scroll navigation for long articles
-- **RSS Feed Generation** - Stay updated with automatic feed generation
-- **Reading Time Estimation** - Know how long articles take to read
-- **Post Categorization** - Organize content with tags and categories
+几个月我也忘了，好像是3月开始学，然后7月正式做完所有LAB，差不多就是...4个月左右吧，我看网上是说一般2个月就能做好了，可能是博主没那么聪明，所以做的比较慢。（慢很多呀！！）
 
+做好所有LAB后，博主就开始学习Linux内核了，一开始是看书，之后是看视频，然后是写内核模块，结果都没有什么用...
+然后博主就想，“哎，能不能直接读代码呢？内核代码！我在内核模块用了一些分配内存的函数嘛，我可不可以通过阅读这些内存管理的函数，来知道自己实际上让内核做了什么呀？”。
+然后博主就开始阅读Linux内核源码了，阅读的是Linux 5.10.245，至于是为什么呢？因为博主的手机用的就是5.10.x的内核，所以觉得这样应该更好。
 
+现在还是在搭配LLM（大语言模型）阅读Linux内核源码，博主本身还没到看什么函数都能一眼顶针的水平，所以得搭配LLM。
+阅读书籍虽然不是完全没用，但是就没有那么细了，只能懂个大概，虽然博主现在的水平也是懂个大概就是了。（甚至是没有大概！）
 
-### 📱 Special Pages
-- **Anime Tracking Page** - Track your anime watching progress with ratings
-- **Friends Links Page** - Showcase friend websites with beautiful cards
-- **Diary/Moments Page** - Share life moments like social media posts
-- **Archive Page** - Organized timeline view of all posts
-- **About Page** - Customizable personal introduction (this page!)
-
-### 🛠 Technical Features
-- **Enhanced Code Blocks** - Powered by [Expressive Code](https://expressive-code.com/)
-- **Math Support** - LaTeX rendering with KaTeX for mathematical expressions
-- **Image Optimization** - PhotoSwipe gallery with lazy loading
-- **SEO Optimized** - Built-in sitemap and meta tags for better search visibility
-- **Performance Optimized** - Fast loading with caching and optimization
-- **Comment System Ready** - Integration support for Twikoo comments
-
-### 🎯 Advanced Markdown Features
-- **Callouts & Admonitions** - Beautiful info boxes with `> [!NOTE]`, `> [!TIP]`, `> [!WARNING]`
-- **Mathematical Equations** - Write LaTeX math with `$inline$` and `$$block$$` syntax
-- **GitHub Cards** - Embed repository cards with `::github{repo="user/repo"}`
-- **Syntax Highlighting** - Advanced code highlighting with line numbers
-- **Copy Code Buttons** - Easy code copying functionality
+差不多就是这样一个普普通通的爱好者的故事了，没有什么太特别的地方，博主也不是什么“自制操作系统”的“超神高中生”，只是名平平无奇的高中生。
 
 ---
-
-*Built with ❤️ using Astro and inspired by modern web design principles.*
+这个网站使用**Astro**框架，主题为[Mizuki](https://github.com/matsuzaka-yuki/mizuki)。
+::github{repo="matsuzaka-yuki/Mizuki"}
