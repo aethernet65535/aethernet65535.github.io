@@ -10,6 +10,8 @@ draft: false
 
 # 前言
 好久没写博客了，回来写写练练手。
+提醒：由于博客比较乱，推荐读者用另一台显示器/设备准备完整的源代码搭配博客食用。
+可以用这个网站：https://elixir.bootlin.com/linux/v5.10.245/source/mm/
 
 ## 状态
 现在在学习的是Linux的内存管理，因为我觉得内存管理应该是操作系统中一个很重要的东西，毕竟计算机最重要的两个硬件就是CPU和内存嘛，虽然文件系统也很重要就是了，不过我觉得有点太难了，所以先不学。
@@ -49,14 +51,14 @@ malloc(sizeof(struct foobar));
 但是，MMU管理的最小单位是4KB（现在安卓和iOS是16KB），这样不是很浪费吗？只用几个字节却要用那么大的页。
 所以聪明的Linux内核开发就想到了，可以把所有申请来的结构体都存在一页，而且他们还能隔离哦，超级厉害！
 
-本来可能是这样：[struct foobar 16B] -> [free 4080]
+本来可能是这样：[struct foobar 16B] -> [free 4080B]
 但是开发者们优化后，就会变成这样：[struct foobar 16B] -> [struct two 10B] -> [struct block 32B] -> [free...] 
 这个，就叫做SLAB！
 
 ### BUDDY
 而`kmalloc_large()`就很好理解啦，就是分配一页一页的内存，因为这样管理大一些的内存更高效呢。
 
-# 源代码
+# `kmalloc()`源代码
 好，现在来看代码吧，代码会让我们更好的理解！
 同样的，我也会选择性忽略SLOB的实现。
 
@@ -520,8 +522,134 @@ EXPORT_SYMBOL(kmalloc_order);
 ```
 这些基本都是调试了，博主就不多说了，该看`kfree()`了。
 
+# `kfree()`调用链
+同样的先来看看调用链。
+```
+kfree()
+|-- __free_pages() [不是SLAB页]
+|	|-- free_the_page()
+|	|	|-- free_unref_page() [如果ORDER==1]		/* 小页释放 */
+|	|	|-- __free_pages_ok [ELSE] 				/* 大页释放 */
+|-- slab_free() [是SLAB页]
+|	|-- do_slab_free()
+|	|	|-- set_freepointer() [如果释放的地址正好是CPU缓存的]
+| 	|	|-- __slab_free() [ELSE]
+```
+由于深入的话有点复杂，所以这里的调用链真的只有个大概而已。
+
+# `kfree()`源代码
+好，接下来直接来看源代码吧，不过博主水平有限，大部分内容不会很详细的解释。
+
+```C
+void kfree(const void *x)
+{
+ struct page *page;
+ void *object = (void *)x;
+
+ trace_kfree(_RET_IP_, x); /* 调试的，不管了 */
+
+ if (unlikely(ZERO_OR_NULL_PTR(x)))
+  return;
+```
+释放空指针，这是内核允许的，你别释放别人在用的指针就行了。
+
+```C
+ page = virt_to_head_page(x);
+```
+刚刚在`kmalloc()`我们知道了我们获取的地址是通过一个名为`page_address()`的函数把`struct page *page`转换为更易于使用的虚拟地址。
+这里就是把虚拟地址转换回那个`page`。
+
+```C
+ if (unlikely(!PageSlab(page))) {
+  unsigned int order = compound_order(page);
+
+  BUG_ON(!PageCompound(page));
+  kfree_hook(object);
+  mod_lruvec_page_state(page, NR_SLAB_UNRECLAIMABLE_B,
+          -(PAGE_SIZE << order));
+  __free_pages(page, order);
+  return;
+ }
+```
+这里的条件判断是，如果`page`不属于SLAB，也就是并非SLAB分配器所分配的页，那就以页为单位进行释放。
+
+```C
+ slab_free(page->slab_cache, page, object, NULL, 1, _RET_IP_);
+}
+EXPORT_SYMBOL(kfree);
+```
+这里就是比较常用的，小对象的释放。
+
+## SLAB
+同样的，由于我们一般是用`kfree()`释放小对象，所以就先说SLAB的版本。
+
+```C
+static __always_inline void slab_free(struct kmem_cache *s, struct page *page,
+				      void *head, void *tail, int cnt,
+				      unsigned long addr)
+{
+	if (slab_free_freelist_hook(s, &head, &tail, &cnt))
+		do_slab_free(s, page, head, tail, cnt, addr);
+}
+```
+`slab_free_freelist_hook()`是调试用的，这里可以先跳过，直接进去下一个函数。
+
+```C
+static __always_inline void do_slab_free(struct kmem_cache *s,
+				struct page *page, void *head, void *tail,
+				int cnt, unsigned long addr)
+{
+	void *tail_obj = tail ? : head;
+	struct kmem_cache_cpu *c;
+	unsigned long tid;
+
+	if (!tail)
+		memcg_slab_free_hook(s, &head, 1);
+```
+这里跳过！博主也看不懂！
+
+```C
+redo:
+	do {
+		tid = this_cpu_read(s->cpu_slab->tid);
+		c = raw_cpu_ptr(s->cpu_slab);
+	} while (IS_ENABLED(CONFIG_PREEMPTION) &&
+		 unlikely(tid != READ_ONCE(c->tid)));
+
+	barrier(); /* 之前解释过，不让前后乱序 */
+```
+这里是和之前一样的乐观锁，我们在`kmalloc()`那里解释过了。
+
+```C
+	if (likely(page == c->page)) { /* struct kmem_cache_cpu *c; */
+		void **freelist = READ_ONCE(c->freelist);
+
+		set_freepointer(s, tail_obj, freelist);
+
+		if (unlikely(!this_cpu_cmpxchg_double(
+				s->cpu_slab->freelist, s->cpu_slab->tid,
+				freelist, tid,
+				head, next_tid(tid)))) {
+
+			note_cmpxchg_failure("slab_free", s, tid);
+			goto redo;
+		}
+		stat(s, FREE_FASTPATH);
+```
+这个还算是好理解的，进入的条件是，如果我们要释放的对象位于该CPU的缓存中。
+接下来，博主来解释一下一些函数：
+`set_freepointer(s, tail_obj, freelist)`：让`tail_obj`（要释放的对象）指向`freelist`（也就是第一个空对象）。虽然在SLUB更复杂，不过读者们可以先暂时这样理解。
+`this_cpu_cmpxchg_double()`： 这个刚刚解释过咯，可以翻到`kmalloc()`节看看。
+
+```C
+	} else
+		__slab_free(s, page, head, tail_obj, cnt, addr);
+
+}
+```
+这个就是个比较通用的路径，也叫做慢路径，刚刚的就叫做快路径。
+
 # 总结
-今天就先这样吧...博主好累了捏，明天继续更新这篇博客，加上`kfree()`的实现。
-继续熬的话就要早上了...（倒下）不过现在这时间点是真的安静呀！
+还没完成，不过博主想睡觉了...（倒下）
 
 最后编辑时间：2025/10/26 AM06:33
