@@ -67,6 +67,7 @@ const levelColors = {
 };
 
 const categoryColors = {
+	kernel: "#272822",// monokai-editor background
 	frontend: "#3B82F6", // blue-500
 	backend: "#8B5CF6", // violet-500
 	database: "#10B981", // emerald-500
@@ -101,6 +102,12 @@ const levelData = [
 // 计算矩形图数据（按技能分类）
 const categoryData = [
 	{
+		name: i18n(I18nKey.skillsKernel),
+		value: stats.byCategory.kernel,
+		color: categoryColors.kernel,
+	},
+	/*
+	{
 		name: i18n(I18nKey.skillsFrontend),
 		value: stats.byCategory.frontend,
 		color: categoryColors.frontend,
@@ -115,6 +122,7 @@ const categoryData = [
 		value: stats.byCategory.database,
 		color: categoryColors.database,
 	},
+	*/
 	{
 		name: i18n(I18nKey.skillsTools),
 		value: stats.byCategory.tools,
