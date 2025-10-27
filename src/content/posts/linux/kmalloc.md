@@ -3,7 +3,7 @@ title: "小对象分配与释放：kmalloc()/kfree()"
 published: 2025-10-24
 description: "开始学习Linux内存管理吧"
 image: "./kmalloc.png"
-tags: ["Memory Management", "Linux"]
+tags: ["Memory Management", "Linux", "Read Code"]
 category: Kernel
 draft: false
 ---
@@ -44,7 +44,7 @@ kmalloc()
 ## 为什么会有两个分支？
 其实原因很简单，一个负责分配大的，一个负责分配小的。
 比如这样，我们写过许多结构体对吧？当我们分配时，是不是这样做的？
-```
+```c
 malloc(sizeof(struct foobar));
 ```
 
@@ -65,7 +65,7 @@ malloc(sizeof(struct foobar));
 同样的，我也会选择性忽略SLOB的实现。
 
 ## kmalloc
-```C
+```c
 static __always_inline void *kmalloc(size_t size, gfp_t flags)
 {
 	if (__builtin_constant_p(size)) { /* 如果size是常量 */
@@ -83,21 +83,21 @@ static __always_inline void *kmalloc(size_t size, gfp_t flags)
 小体量的话会走`__kmalloc(size, flags)`，分配的是一个SLAB的对象，可能比你预期的大小要来的大，但绝对不会更小。
 
 ### 知识补充点
-```
+```c
 __builtin_constant_p(size)
 ```
 这个判断是，输入是否是编译期间的常量，可以提升几纳秒的速度（已经很好了！！）。
 那什么是编译期间的常量呢？
 
 编译时常量：
-```C
+```c
 #define SIZE 1024
 static const int size = 1023+1;
 1024+255
 sizeof(struct foobar)
 ```
 非编译时常量：
-```C
+```c
 int size = 1023+1;
 int size = rdm();
 int size = usr_input + 1024;
@@ -106,11 +106,11 @@ int size = usr_input + 1024;
 具体怎么优化呢？
 差不多是这样：
 本来我们内核模块写的是这样：
-```C
+```c
 char *addr = kmalloc(64, GFP_KERNEL);
 ```
 由于`64`是常量，所以编译器就会这样优化我们的代码：
-```C
+```c
 char *addr = __kmalloc(64, GFP_KERNEL);
 ```
 几纳秒的提升速度对一次分配来说可能没有什么区别，但是对频繁分配还是很有益的，可以为用户节省不少时间呢。
@@ -118,7 +118,7 @@ char *addr = __kmalloc(64, GFP_KERNEL);
 ## __kmalloc
 由于我们一般对`kmalloc()`的应用在小内存分配，所以就先看看对应的SLAB分配版本吧！
 
-```C
+```c
 void *__kmalloc(size_t size, gfp_t flags)
 {
 	struct kmem_cache *s;
@@ -129,25 +129,25 @@ void *__kmalloc(size_t size, gfp_t flags)
 ```
 因为我们大概率是从kmalloc进来的，所以这个条件大部分情况下并不为真。
 
-```C
+```c
 	s = kmalloc_slab(size, flags);
 ```
 这个函数是去找我们应该用什么大小的内存，比如我希望获得13字节的内存，但是内核觉得13这数字太邪门了，于是就给我分配了16字节的内存，比较吉利。
 当然和信仰没关系，只是16更好对齐而已（笑）。
 
-```C
+```c
 	if (unlikely(ZERO_OR_NULL_PTR(s)))
 		return s;
 ```
 有时候，我们会输入`kmalloc(foobar, GFP_KERNEL)`，`foobar`可能为`0`，但是其实这是没问题的，内核允许发生这样的行为，所以只会取消分配内存，并不会报错，就像`kfree(NULL)`不会出问题一样。
 注：申请`0`内存的话，返回为`((void *)16)`，非法或`kmalloc_slab()`函数失败返回`NULL`。
 
-```C
+```c
 	ret = slab_alloc(s, flags, _RET_IP_);
 ```
 刚刚的`kmalloc_slab()`找到了要给调用放分配多少内存，这个函数做的就是分配内存的工作。
 
-```C
+```c
 	trace_kmalloc(_RET_IP_, ret, size, s->size, flags);
 
 	ret = kasan_kmalloc(s, ret, size, flags);
@@ -159,14 +159,14 @@ void *__kmalloc(size_t size, gfp_t flags)
 
 
 ### 知识补充点
-```C
+```c
 EXPORT_SYMBOL(__kmalloc);
 ```
 这个简单来说就是，如果有的话，内核模块就能直接调用了，如果没有的话内核模块就只能间接调用。
 类似开放API吧，开放给内核模块使用。有另一个GPL版本的，那种是之开放给GPL协议的模块使用。
 
 ## kmalloc_slab
-```C
+```c
 struct kmem_cache *kmalloc_slab(size_t size, gfp_t flags)
 {
 	unsigned int index;
@@ -179,7 +179,7 @@ struct kmem_cache *kmalloc_slab(size_t size, gfp_t flags)
 		index = size_index[size_index_elem(size)];
 ```
 这里我们直接进入`size_index`这一个数组吧，毕竟不大。
-```C
+```c
 static u8 size_index[24] __ro_after_init = {
 	3,	/* 8 */
 	4,	/* 16 */
@@ -211,7 +211,7 @@ static u8 size_index[24] __ro_after_init = {
 但是，为什么192字节的下标是2呢？是不是很奇怪呢？这个就要配合另一个函数看了呢（悲，嵌套真多呀）。
 
 不过在那之前，我们得先知道，怎么得到这些索引。
-```C
+```c
 static inline unsigned int size_index_elem(unsigned int bytes)
 {
 	return (bytes - 1) / 8;
@@ -219,7 +219,7 @@ static inline unsigned int size_index_elem(unsigned int bytes)
 ```
 就是这样而已，非常简单，减1然后再除8。好那我们继续吧！
 
-```C
+```c
 const struct kmalloc_info_struct kmalloc_info[] __initconst = {
 	INIT_KMALLOC_INFO(0, 0),               /* 0 */
 	INIT_KMALLOC_INFO(96, 96),             /* 1 */
@@ -253,14 +253,14 @@ const struct kmalloc_info_struct kmalloc_info[] __initconst = {
 也就是说，如果传进来的是8字节，那么就会返回说“给调用方分8字节吧！”。
 如果传进来的是77字节，我们来算一下，`(77 - 1) = 76, 76 / 8 = 9.5 == 9`，那么就是第9个！
 我们看看是哪个，嗯，是这个：
-```C
+```c
 	1,	/* 80 */
     INIT_KMALLOC_INFO(96, 96),             /* 1 */
 ```
 如果我们申请了77字节，系统就会给我们升级成96字节，原因我们先不用太在意，博主想可能是因为这个位比较有性价比之类的。
 这里是通过`size_inde`定位到`kmalloc_info`的位置。
 
-```C
+```c
 	} else {
         /* 怎么想都不会触发这个吧（笑）*/
 		if (WARN_ON_ONCE(size > KMALLOC_MAX_CACHE_SIZE))
@@ -270,20 +270,20 @@ const struct kmalloc_info_struct kmalloc_info[] __initconst = {
 ```
 `fls()`的话，是找到`size-1`最高的1位在第几位。
 比如`size`是16，-1后就是15，也就是0000000000001111，最高的1位就是第四位，那我们看看4是多少：
-```C
+```c
 	INIT_KMALLOC_INFO(16, 16),             /* 4 */
 ```
 我们可以发现，这里就不使用`size_index`了，而是直接定位到`kmalloc_info`的位置。
 
 
-```C
+```c
 	return kmalloc_caches[kmalloc_type(flags)][index];
 }
 ```
 这里就是返回“要哪里的内存+要多少内存”，类似一个标签，方便`slab_alloc()`分配。
 感兴趣的可以先继续看下去，不感兴趣的可以直接不看这个函数了。
 
-```C
+```c
 static __always_inline enum kmalloc_cache_type kmalloc_type(gfp_t flags)
 {
 #ifdef CONFIG_ZONE_DMA
@@ -297,7 +297,7 @@ static __always_inline enum kmalloc_cache_type kmalloc_type(gfp_t flags)
 如果调用方所传入的`flags`不包含`__GFP_DMA`和`__GFP_RECLAIMABLE`，那么就直接返回`KMALLOC_NORMAL`。
 可能是因为Linux认为一般上都用不到这两个，`GFP_KERNEL`也确实都没有这两个。
 
-```C
+```c
 	/*
 	 * At least one of the flags has to be set. If both are, __GFP_DMA
 	 * is more important.
@@ -308,7 +308,7 @@ static __always_inline enum kmalloc_cache_type kmalloc_type(gfp_t flags)
 如果包含，就会返回`KMALLOC_DMA`，这样之后分配时系统就知道我们要把内存分配给DMA，以此更好的对这次分配做优化。
 如果不包含，那就返回`KMALLOC_RECLAIM`，也就是可回收内存。
 
-```C
+```c
 #else
 	return flags & __GFP_RECLAIMABLE ? KMALLOC_RECLAIM : KMALLOC_NORMAL;
 #endif
@@ -319,7 +319,7 @@ static __always_inline enum kmalloc_cache_type kmalloc_type(gfp_t flags)
 如果没有的话，就直接返回`KMALLOC_NORMAL`了，和DMA的区别就是少了个`KMALLOC_DMA`而已。
 
 ## slab_alloc
-```C
+```c
 static __always_inline void *slab_alloc(struct kmem_cache *s,
 		gfp_t gfpflags, unsigned long addr)
 {
@@ -329,7 +329,7 @@ static __always_inline void *slab_alloc(struct kmem_cache *s,
 这个我们直接进去就好了，关于`NUMA_NO_NODE`的话，这个的意思是，哪个NODE好哪个来，让系统看着办。
 不过NUMA一般是服务器的，我们的机器一般是UMA（至少博主的古老设备是）。
 
-```C
+```c
 static __always_inline void *slab_alloc_node(struct kmem_cache *s,
 		gfp_t gfpflags, int node, unsigned long addr)
 {
@@ -345,7 +345,7 @@ static __always_inline void *slab_alloc_node(struct kmem_cache *s,
 ```
 这个`slab_pre_alloc_hook()`主要是调试用的函数，博主太笨了，先跳过。
 
-```C
+```c
 redo:
 	do {
 		tid = this_cpu_read(s->cpu_slab->tid);
@@ -367,7 +367,7 @@ redo:
 "在我工作的时候，如果有人动过我的工具箱（tid变化了），我就得重新确认一下工作环境，避免把书放错位置！"
 
 那可能被影响的工作环境是什么呢？博主知道的其中一个是这个：
-```C
+```c
 struct kmem_cache_cpu {
 	void **freelist;	/* Pointer to next available object */
 	unsigned long tid;	/* Globally unique transaction id */
@@ -390,20 +390,20 @@ SLAB的比较特别，因为SLAB是多多东西挤在一个页里的，所以`km
 - `struct page *page`： 这个就是那个挤一堆对象的页。
 - `struct page *partial`： 这个是备用的，指向一个`page`链表，博主推测是满了后就可以快速换成另一个可用`page`。
 
-```C
+```c
 	barrier();
 ```
 这个是给编译器提醒的，就是说，`barrier()`之前的代码，不能跑到`barrier()`之后。
 同样的`barrier()`之后的代码，也不能跑到`barrier()`之前执行。
 因为编译器和CPU都喜欢优化，所以可能会乱序一些代码，怎么开心怎么来，所以我们就用这个限制。
 
-```C
+```c
 	object = c->freelist;
 	page = c->page;
 ```
 刚刚说了，`freelist`就是指向第一个空闲对象的指针，再次提醒，他也可以叫FREE POINTER哦！
 
-```C
+```c
 	if (unlikely(!object || !page || !node_match(page, node))) {
 		object = __slab_alloc(s, gfpflags, node, addr, c);
 ```
@@ -416,13 +416,13 @@ SLAB的比较特别，因为SLAB是多多东西挤在一个页里的，所以`km
 2. 如果没有，去对应NUMA节点的`partial`链表找。
 3. 如果还没有，那就只能从BUDDY分配全新的页了。
 
-```C
+```c
 	} else {
 		void *next_object = get_freepointer_safe(s, object);                                                                                                                                                  
 ```
 我们拿走了这个对象后，下一个空闲的对象在哪，函数将返回下一个空闲对象的地址。
 
-```C
+```c
 		if (unlikely(!this_cpu_cmpxchg_double(
 				s->cpu_slab->freelist, s->cpu_slab->tid,
 				object, tid,
@@ -433,24 +433,24 @@ SLAB的比较特别，因为SLAB是多多东西挤在一个页里的，所以`km
 		}
 ```
 和刚刚的乐观锁差不多，`this_cpu_cmpxchg_double()`期待，到达这行时：
-```C
+```c
 s->cpu_slab->freelist == object
 s->cpu_slab->tid == tid
 ```
 如果确实是这样，那么就会执行：
-```C
+```c
 s->cpu_slab->frelist = next_object;
 s->cpu_slab->tid = next_tid(tid);
 ```
 
-```C
+```c
 		prefetch_freepointer(s, next_object);
 		stat(s, ALLOC_FASTPATH);
 	}
 ```
 `prefetch_freepointer()`： Linux觉得，我们不久后就会访问这个地址，也就是再申请多一个同类型的对象，所以就先预热一下，让等下可以直接缓存命中。
 
-```C
+```c
 	maybe_wipe_obj_freeptr(s, object); 
 
 	if (unlikely(slab_want_init_on_alloc(gfpflags, s)) && object)
@@ -466,7 +466,7 @@ s->cpu_slab->tid = next_tid(tid);
 
 ## kmalloc_large
 好，现在来看一下`kmalloc_large()`，差点忘了这个函数。
-```C
+```c
 static __always_inline void *kmalloc_large(size_t size, gfp_t flags)
 {
  unsigned int order = get_order(size);
@@ -475,7 +475,7 @@ static __always_inline void *kmalloc_large(size_t size, gfp_t flags)
 ```
 有trace的基本就是调试的意思，不过这里不能跳过了，跳了就没东西看了。
 
-```C
+```c
 #ifdef CONFIG_TRACING
 void *kmalloc_order_trace(size_t size, gfp_t flags, unsigned int order)
 {
@@ -488,7 +488,7 @@ EXPORT_SYMBOL(kmalloc_order_trace);
 ```
 好，这里我想读者们都看得懂，就是返回值要从一个名为`kmalloc_order()`的函数获取，理解这个就好了。
 
-```C
+```c
 void *kmalloc_order(size_t size, gfp_t flags, unsigned int order)
 {
  void *ret = NULL;
@@ -499,12 +499,12 @@ void *kmalloc_order(size_t size, gfp_t flags, unsigned int order)
 ```
 博主也看不懂`GFP_SLAB_BUG_MASK`是什么，不过会有一个函数帮我们修复标志，所以放心好了。
 
-```C
+```c
  flags |= __GFP_COMP;
 ```
 这个是复合页的意思，就是告诉Buddy分配器说“要把页合在一起”，而不是排在一起而已，如果有`__GFP_COMP`的话内核就能找到头页在哪。
 
-```C
+```c
  page = alloc_pages(flags, order);
  if (likely(page)) {
   ret = page_address(page);
@@ -514,7 +514,7 @@ void *kmalloc_order(size_t size, gfp_t flags, unsigned int order)
 ```
 这里就是从Buddy分配一个页，但是这个页不是我们平常用的那种，而是一个页管理结构体，我们需要把结构体转换为虚拟地址，也就是`page_address()`，这样我们就获得了一个我们平常使用的虚拟地址了。
 
-```C
+```c
  ret = kasan_kmalloc_large(ret, size, flags);
  /* As ret might get tagged, call kmemleak hook after KASAN. */
  kmemleak_alloc(ret, size, 1, flags);
@@ -542,7 +542,7 @@ kfree()
 # `kfree()`源代码
 好，接下来直接来看源代码吧，不过博主水平有限，大部分内容不会很详细的解释。
 
-```C
+```c
 void kfree(const void *x)
 {
  struct page *page;
@@ -555,13 +555,13 @@ void kfree(const void *x)
 ```
 释放空指针，这是内核允许的，你别释放别人在用的指针就行了。
 
-```C
+```c
  page = virt_to_head_page(x);
 ```
 刚刚在`kmalloc()`我们知道了我们获取的地址是通过一个名为`page_address()`的函数把`struct page *page`转换为更易于使用的虚拟地址。
 这里就是把虚拟地址转换回那个`page`。
 
-```C
+```c
  if (unlikely(!PageSlab(page))) {
   unsigned int order = compound_order(page);
 
@@ -575,7 +575,7 @@ void kfree(const void *x)
 ```
 这里的条件判断是，如果`page`不属于SLAB，也就是并非SLAB分配器所分配的页，那就以页为单位进行释放。
 
-```C
+```c
  slab_free(page->slab_cache, page, object, NULL, 1, _RET_IP_);
 }
 EXPORT_SYMBOL(kfree);
@@ -585,7 +585,7 @@ EXPORT_SYMBOL(kfree);
 ## SLAB
 同样的，由于我们一般是用`kfree()`释放小对象，所以就先说SLAB的版本。
 
-```C
+```c
 static __always_inline void slab_free(struct kmem_cache *s, struct page *page,
 				      void *head, void *tail, int cnt,
 				      unsigned long addr)
@@ -596,7 +596,7 @@ static __always_inline void slab_free(struct kmem_cache *s, struct page *page,
 ```
 `slab_free_freelist_hook()`是调试用的，这里可以先跳过，直接进去下一个函数。
 
-```C
+```c
 static __always_inline void do_slab_free(struct kmem_cache *s,
 				struct page *page, void *head, void *tail,
 				int cnt, unsigned long addr)
@@ -605,12 +605,25 @@ static __always_inline void do_slab_free(struct kmem_cache *s,
 	struct kmem_cache_cpu *c;
 	unsigned long tid;
 
-	if (!tail)
+	if (!tail) /* 这条件的结果在这必然为真 */
 		memcg_slab_free_hook(s, &head, 1);
 ```
-这里跳过！博主也看不懂！
+`memcg_slab_free_hook()`：这是内存控制组（memcg）的相关函数，只有在启用`CONFIG_MEMCG_KMEM`时才会实际执行。
 
-```C
+它的主要工作是：
+1. 通过`virt_to_head_page()`找到对象所属的页头
+2. 从页面的`obj_cgroups`数组中找到对应的内存控制组记录
+3. 执行三项关键操作：
+   - `obj_cgroup_uncharge()`：减少控制组的内存总占用量
+   - `mod_objcg_state()`：更新内存统计状态
+   - `obj_cgroup_put()`：减少控制组的引用计数
+
+一般上有"put"的函数就是减少引用次数的意思。
+
+简单理解就是：当对象释放时，需要更新内存资源记账系统，确保每个cgroup使用的内存量统计准确。
+如果还是看不懂的话，那也没关系，就只是个记账的函数而已，对我们理解`kfree()`的帮助不是太大。
+
+```c
 redo:
 	do {
 		tid = this_cpu_read(s->cpu_slab->tid);
@@ -622,7 +635,7 @@ redo:
 ```
 这里是和之前一样的乐观锁，我们在`kmalloc()`那里解释过了。
 
-```C
+```c
 	if (likely(page == c->page)) { /* struct kmem_cache_cpu *c; */
 		void **freelist = READ_ONCE(c->freelist);
 
@@ -643,7 +656,7 @@ redo:
 `set_freepointer(s, tail_obj, freelist)`：让`tail_obj`（要释放的对象）的FREE POINTER指向`freelist`（也就是第一个空对象）。
 `this_cpu_cmpxchg_double()`： 这个刚刚解释过咯，可以翻到`kmalloc()`节看看。
 
-```C
+```c
 	} else
 		__slab_free(s, page, head, tail_obj, cnt, addr);
 
@@ -654,14 +667,14 @@ redo:
 ### 快路径
 我们先看比较理想化的吧，因为这种一般没有太多判断，而且比较容易触发。
 
-```C
+```c
 static inline void set_freepointer(struct kmem_cache *s, void *object, void *fp)
 {
 	unsigned long freeptr_addr = (unsigned long)object + s->offset;
 ```
 这个刚刚我们也见到了，就是每个对象的FREE POINTER位置都是相对固定的，只要加上对应的偏移量就能找到了，只是我们在分配的时候释放掉了FREE POINTER。
 
-```C
+```c
 	*(void **)freeptr_addr = freelist_ptr(s, fp, freeptr_addr); /* void **freelist */
 }
 ```
@@ -670,7 +683,7 @@ static inline void set_freepointer(struct kmem_cache *s, void *object, void *fp)
 
 简单点说就是，让`object`的FREE POINTER指向`freelist`。（超级好理解吧哼哼）
 
-```C
+```c
 static inline void *freelist_ptr(const struct kmem_cache *s, void *ptr,
 				 unsigned long ptr_addr)
 {
@@ -693,7 +706,7 @@ static inline void *freelist_ptr(const struct kmem_cache *s, void *ptr,
 
 #### 从`set_freepointer()`返回后 / 快路径的结束
 
-```C
+```c
 		if (unlikely(!this_cpu_cmpxchg_double(
 				s->cpu_slab->freelist, s->cpu_slab->tid,
 				freelist, tid,
@@ -705,7 +718,190 @@ static inline void *freelist_ptr(const struct kmem_cache *s, void *ptr,
 其他的就不必管了，不是什么大问题。
 啊还有，要问如果失败会怎么样的话...首选会先记录，然后重来（`redo`），不过`redo`我们就不看了...
 
+### 慢路径
+好，现在我们来看一个更通用，但是更复杂的路径，名为慢路径。
+```c
+static void __slab_free(struct kmem_cache *s, struct page *page,
+			void *head, void *tail, int cnt,
+			unsigned long addr)
+
+{
+	void *prior;
+	int was_frozen;
+	struct page new;
+	unsigned long counters;
+	struct kmem_cache_node *n = NULL;
+	unsigned long flags;
+
+	stat(s, FREE_SLOWPATH);
+
+	if (kmem_cache_debug(s) &&
+	    !free_debug_processing(s, page, head, tail, cnt, addr))
+		return;
+```
+第一个函数主要是检查类的函数，对我们理解`kfree()`核心逻辑的帮助不大，不过可以稍微过一下。
+
+这个函数主要是做：
+- 检查双重释放（double free）
+- 验证对象边界和完整性
+- 内存泄漏检测
+- 各种slub调试功能
+
+```c
+	do {
+		if (unlikely(n)) {
+			spin_unlock_irqrestore(&n->list_lock, flags);
+			n = NULL;
+		}
+```
+这个的意思是，如果while条件不成功，就要放弃之前拿的`kmem_cache_node`。
+
+```c
+		/* 重点，其他的可以稍微不那么在意 */
+		prior = page->freelist;
+		counters = page->counters;
+		set_freepointer(s, tail, prior); /* 让tail的fp指向prior */
+		new.counters = counters;
+		was_frozen = new.frozen;
+		new.inuse -= cnt;
+```
+这里重点说一下`counters = page->counters`，可能会有读者好奇，`was_frozen = new.frozen`这行难道不是未定义行为吗？
+说起来挺神奇的，似乎是`page->counters`这个字段就包含了`frozen`字段，好像是因为页管理使用了神奇的位标志来管理字段。
+
+接下来再解释一下各个字段的意思：
+- `counters`：一个很神奇的字段，叫作复合字段，通过位存储多个状态信息
+- `frozen`：这个表示当前页有没有在CPU上面缓存（1 = 在缓存，0 = 不在缓存）
+- `inuse`：当前SLAB页面中已分配的对象数量（使用中的）
+
+```c
+		if ((!new.inuse || !prior) && !was_frozen) {
+
+			if (kmem_cache_has_cpu_partial(s) && !prior) {
+			
+				new.frozen = 1;
+				
+			} else {
+			
+				n = get_node(s, page_to_nid(page));
+				spin_lock_irqsave(&n->list_lock, flags);
+
+			}
+		}
+
+	} while (!cmpxchg_double_slab(s, page,
+		prior, counters,
+		head, new.counters,
+		"__slab_free"));
+```
+- `new.inuse`：释放我们的对象后，还有没有其他使用中的对象在当前SLAB页。
+- `prior`：当前SLAB页是否还有空闲的对象。
+- `was_frozen`：这个页是不是本来就已经在缓存上了。
+
+然后我们说一下if-else分支分别是干什么的：
+- if：如果这个`kmem_cache`是适合保存在CPU上的 && 还有空闲的对象。
+那就把这SLAB页面缓存在CPU上。
+- else：获取当前`kmem_cache`在NODE上的缓存，并用自旋锁保护一下。
+
+`cmpxchg_double_slab()`：这个也不难，读者们可以尝试自己看看源代码。
+只要同时达成这个条件：
+```c
+page->freelist == prior
+page->counters == counters
+```
+那就会执行：
+```c
+page->freelist = head;
+page->counters = new.counters
+```
+之后`page`的`frozen`和`inuse`之类的就变成`new`计算好的那些了。
+
+`s`的话，就是个记录用的，不用管！
+
+#### 为什么if分支不加锁？
+我们先暂且把if分支称为“FROZEN分支”吧。
+
+FROZEN分支从循环出去后，必然操作该CPU独占的数据，不可能是其他CPU的数据或共享的数据，所以不需要锁，所有CPU都只能访问自己的CPU数据。
+而ELSE分支从循环出去后，必然操作共享的数据，所以就得带上锁，避免和其他CPU同时的修改某个数据。
+
+简单的说就是：
+- FROZEN分支操作的是“CPU私有资源”，天然无并发。
+- E;SE分支操作的是“全局共享资源”，必须加锁同步。
+
+```c
+	if (likely(!n)) {
+
+		if (likely(was_frozen)) {
+			stat(s, FREE_FROZEN);
+		} else if (new.frozen) {
+			put_cpu_partial(s, page, 1);
+			stat(s, CPU_PARTIAL_FREE);
+		}
+
+		return;
+	}
+```
+从这里的触发条件可以看出，刚刚的FROZEN分支触发概率更高。
+这里的逻辑是：
+- IF分支：
+如果本来就已经被缓存了，那就直接记录这次的行为并返回就行了。读者可能好奇为什么没有释放的操作，其实已经有了，就在刚刚的：
+```c
+		set_freepointer(s, tail, prior); /* 让tail的fp指向prior */
+		page->freelist = head; /* 这里就已经完成释放了 */
+		page->counters = new.counters;
+```
+可以说和快路径很像呢。
+
+- ELSE分支：
+如果是刚刚要缓存的，那就直接把当前SLAB页面放进CPU缓存内，至于上一个SLAB页面怎么处理...内核肯定有自己的办法吧。
+至此，FROZEN分支的操作完毕，就如之前所说的，FROZEN分支只可能操作当前CPU。
+
+```c
+	if (unlikely(!new.inuse && n->nr_partial >= s->min_partial))
+		goto slab_empty;
+
+	if (!kmem_cache_has_cpu_partial(s) && unlikely(!prior)) {
+		remove_full(s, n, page);
+		add_partial(n, page, DEACTIVATE_TO_TAIL);
+		stat(s, FREE_ADD_PARTIAL);
+	}
+	spin_unlock_irqrestore(&n->list_lock, flags);
+	return;
+```
+能来到这里的只有可能是ELSE分支过来的了。
+第一个条件判断：
+页面完全空闲 + 当前节点已经有足够多的PARTIAL SLAB页面了。
+既然已经用不到了，那就会全部还给BUDDY了。
+
+第二个条件判断：
+如果这个`kmem_cache`不支持在CPU上缓存，并且已经满了。
+那就要把它从FULL换成PARTIAL。
+其实`remove_full`和`add_partial`的意思更接近REMOVE SLAB FROM FULL和ADD SLAB TO PARTIAL。
+
+```c
+slab_empty:
+	if (prior) {
+		remove_partial(n, page);
+		stat(s, FREE_REMOVE_PARTIAL);
+	} else {
+		remove_full(s, n, page);
+	}
+
+	spin_unlock_irqrestore(&n->list_lock, flags);
+	stat(s, FREE_SLAB);
+	discard_slab(s, page);
+}
+```
+全部还回去的实现有两个，就普通来说的话，只有可能是IF分支。
+IF分支是说现在还有空闲对象，所以就视为PARTIAL，把该SLAB从PARTIAL列表中移除。
+ELSE分支是说，本来就是满的，现在调用方要全部释放，但是`kfree()`只释放单个对象，所以不可能是ELSE分支。
+最后的`discard_slab()`就是，真正的释放，之前的只是从列表中移除而已。
+
+好的，慢路径正式结束！`kfree()`没有返回所以我们就不说了！
+
+# 还没写的
+- 页级释放
+
 # 总结
 还没完成，不过博主想睡觉了...（倒下）
 
-最后编辑时间：2025/10/26 AM06:33
+最后编辑时间：2025/10/28 AM04:11
