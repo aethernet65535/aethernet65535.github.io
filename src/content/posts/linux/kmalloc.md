@@ -898,10 +898,199 @@ ELSE分支是说，本来就是满的，现在调用方要全部释放，但是`
 
 好的，慢路径正式结束！`kfree()`没有返回所以我们就不说了！
 
-# 还没写的
-- 页级释放
+## 页释放
+虽然这类释放比较不常用，不过概率还没到几乎用不到，所以还是得说一下。
+```c
+void __free_pages(struct page *page, unsigned int order)
+{
+ int head = PageHead(page);
+```
+博主不理解为何这里要在定位到头多一次，而且博主也找不到这个函数。
+博主想这个应该只是判断page是否为头页。
+
+```c
+if (put_page_testzero(page))
+  free_the_page(page, order);
+```
+测试是否是最后一个引用，如果是就释放，如果不是就直接结束。
+
+```c
+ else if (!head)
+  while (order-- > 0)
+   free_the_page(page + (1 << order), order);
+}
+EXPORT_SYMBOL(__free_pages);
+```
+这个就博主看不懂，不过由于`kfree()`路径不可能触发这里，所以就不管了！
+
+```c
+static inline void free_the_page(struct page *page, unsigned int order)
+{
+	if (order == 0)
+		free_unref_page(page);
+	else
+		__free_pages_ok(page, order, FPI_NONE);
+}
+```
+我们进去这里，可以发现，页释放有两种情况，一种是单页，一种是复合页。会分两种情况是因为小页适合缓存，而大页不适合，下次申请很难和缓存上的`order`相同。
+
+#### 单页释放
+```c
+void free_unref_page(struct page *page)
+{
+	unsigned long flags;
+	unsigned long pfn = page_to_pfn(page);
+
+	if (!free_unref_page_prepare(page, pfn))
+		return;
+
+	local_irq_save(flags);
+	free_unref_page_commit(page, pfn);
+	local_irq_restore(flags);
+}
+```
+首先先获得`pfn`，这个是找到页物理地址的关键，之后再准备一些东西，准备什么先不用太在意，我们直接去看主逻辑。
+
+```c
+static void free_unref_page_commit(struct page *page, unsigned long pfn)
+{
+	struct zone *zone = page_zone(page);
+	struct per_cpu_pages *pcp;
+	int migratetype;
+
+	migratetype = get_pcppage_migratetype(page);
+	__count_vm_event(PGFREE);
+```
+这里基本都是准备+调试而已。
+
+```c
+	if (migratetype >= MIGRATE_PCPTYPES) {
+		if (unlikely(is_migrate_isolate(migratetype))) {
+			free_one_page(zone, page, pfn, 0, migratetype,
+				      FPI_NONE);
+			return;
+		}
+		migratetype = MIGRATE_MOVABLE;
+	}
+```
+这个循环的意思是，如果迁移类型不是以下这些：
+```c
+MIGRATE_UNMOVABLE,
+MIGRATE_MOVABLE,
+MIGRATE_RECLAIMABLE,
+```
+那就检测是否为`MIGRATE_ISOLATE`，如果是，那就直接释放，隔离页不能存放在PCP上。
+如果不是隔离页，那么就暂时标记为`MIGRATE_MOVABLE`，并不会改变页本身的迁移类型。
+
+```c
+	pcp = &this_cpu_ptr(zone->pageset)->pcp;
+	list_add(&page->lru, &pcp->lists[migratetype]);
+	pcp->count++;
+	if (pcp->count >= pcp->high) {
+		unsigned long batch = READ_ONCE(pcp->batch);
+		free_pcppages_bulk(zone, batch, pcp);
+	}
+}
+```
+然后把页添加进对应的迁移类型的PCP链表上，并增加PCP总页数。
+之后会再检查PCP总页数是否太多了，如果太多了，就会释放一部分，因为要保证不会爆满。
+
+```c
+static void free_pcppages_bulk(struct zone *zone, int count,
+					struct per_cpu_pages *pcp)
+{
+	int migratetype = 0;
+	int batch_free = 0;
+	int prefetch_nr = 0;
+	bool isolated_pageblocks;
+	struct page *page, *tmp;
+	LIST_HEAD(head);
+```
+这里先不用太在意，记一下就行了，反正之后还可以回来再看。
+`head`是我们的临时链表。
+
+```c
+	count = min(pcp->count, count);
+	while (count) {
+		struct list_head *list;
+
+		do {
+			batch_free++;
+			if (++migratetype == MIGRATE_PCPTYPES)
+				migratetype = 0;
+			list = &pcp->lists[migratetype];
+		} while (list_empty(list));
+```
+第一个循环，这个DO-WHILE循环是要找到有哪个类型的PCP链表是有东西的，而非空的。
+`batch_free`：循环次数记录
+这个循环只会检查：
+```c
+MIGRATE_UNMOVABLE,
+MIGRATE_MOVABLE,
+MIGRATE_RECLAIMABLE,
+```
+其他的类型不会被检查。
+
+```c
+		if (batch_free == MIGRATE_PCPTYPES)
+			batch_free = count;
+```
+触发这里时，代表`if (++migratetype == MIGRATE_PCPTYPES)`也同样被触发了，否则不可能触发这里。
+具体目的是什么博主也不清楚，只能先看再说。
+
+```c
+		do {
+			page = list_last_entry(list, struct page, lru);
+			list_del(&page->lru);
+			pcp->count--;
+
+			if (bulkfree_pcp_prepare(page))
+				continue;
+
+			list_add_tail(&page->lru, &head);
+
+			if (prefetch_nr++ < pcp->batch)
+				prefetch_buddy(page);
+		} while (--count && --batch_free && !list_empty(list));
+	}
+```
+这个循环做的事情就是：
+- 从非空`list`获取页
+- 从PCP链表中移除该页
+- 减少总页数
+- 把页加入临时链表
+
+`prepare`的话基本都是准备，在遇到问题前我一般都不会看这类函数，因为核心逻辑一般不在那里。
+`prefetch_buddy()`：把`page`对应的`buddy`放到缓存预热下，减少缓存未命中的可能性。
+
+简单点来说，这基本就是真正释放前做的准备而已。
+
+```c
+	spin_lock(&zone->lock);
+	isolated_pageblocks = has_isolate_pageblock(zone);
+
+	list_for_each_entry_safe(page, tmp, &head, lru) {
+		int mt = get_pcppage_migratetype(page);
+		VM_BUG_ON_PAGE(is_migrate_isolate(mt), page);
+		if (unlikely(isolated_pageblocks))
+			mt = get_pageblock_migratetype(page);
+
+		__free_one_page(page, page_to_pfn(page), zone, 0, mt, FPI_NONE);
+		trace_mm_page_pcpu_drain(page, 0, mt);
+	}
+	spin_unlock(&zone->lock);
+}
+```
+这个循环会遍历`head`，
+`__free_one_page()`：这个我打算在复合页释放细说，这里的话就只要知道，这个函数是把页释放回BUDDY的就好了。
 
 # 总结
 还没完成，不过博主想睡觉了...（倒下）
 
-最后编辑时间：2025/10/28 AM04:11
+## 之后的打算
+博主之后打算重新整理一下这篇博文，因为感觉这样的结构有点乱，也不利于管理。
+博主可能会把部分函数移到其他博文，其他博文可能会叫“实用的内存管理内部API”之类的。
+反正就是，感觉这里的基础科普有点太多了，当然一部分原因是因为博主自己也是刚学的，所以就写下来了。
+之后会把比较基础的放到别的博文里，比较易于管理。
+
+最后编辑时间：2025/10/29 AM04:05
