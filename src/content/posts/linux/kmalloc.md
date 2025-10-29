@@ -1084,8 +1084,229 @@ MIGRATE_RECLAIMABLE,
 这个循环会遍历`head`，
 `__free_one_page()`：这个我打算在复合页释放细说，这里的话就只要知道，这个函数是把页释放回BUDDY的就好了。
 
+#### 复合页释放
+```c
+static void __free_pages_ok(struct page *page, unsigned int order,
+			    fpi_t fpi_flags)
+{
+	unsigned long flags;
+	int migratetype;
+	unsigned long pfn = page_to_pfn(page);
+
+	if (!free_pages_prepare(page, order, true))
+		return;
+
+	migratetype = get_pfnblock_migratetype(page, pfn);
+	local_irq_save(flags);
+	__count_vm_events(PGFREE, 1 << order);
+	free_one_page(page_zone(page), page, pfn, order, migratetype,
+		      fpi_flags);
+	local_irq_restore(flags);
+}
+```
+这里的`free_one_page()`里面函数最为重要。
+
+```c
+static void free_one_page(struct zone *zone,
+				struct page *page, unsigned long pfn,
+				unsigned int order,
+				int migratetype, fpi_t fpi_flags)
+{
+	spin_lock(&zone->lock);
+	if (unlikely(has_isolate_pageblock(zone) ||
+		is_migrate_isolate(migratetype))) {
+		migratetype = get_pfnblock_migratetype(page, pfn);
+	}
+	__free_one_page(page, pfn, zone, order, migratetype, fpi_flags);
+	spin_unlock(&zone->lock);
+}
+```
+这里的IF判断条件做的是：如果检测到是隔离页，那就再检查多一次。
+
+```c
+static inline void __free_one_page(struct page *page,
+		unsigned long pfn,
+		struct zone *zone, unsigned int order,
+		int migratetype, fpi_t fpi_flags)
+{
+	struct capture_control *capc = task_capc(zone);
+	unsigned long buddy_pfn;
+	unsigned long combined_pfn;
+	unsigned int max_order;
+	struct page *buddy;
+	bool to_tail;
+
+	max_order = min_t(unsigned int, MAX_ORDER - 1, pageblock_order);
+```
+这个就是`kfree()`最为核心的函数了，而且意外的不难理解。
+
+```c
+	VM_BUG_ON(!zone_is_initialized(zone));
+```
+博主来一个一个解释这些边界情况，不过一般`kmalloc()`+`kfree()`的组合是不会触发的。
+1. 确保我们不会在未初始化的内存域上操作。
+
+```c
+	VM_BUG_ON_PAGE(page->flags & PAGE_FLAGS_CHECK_AT_PREP, page);
+```
+2. 页面在准备释放时不应该还有"AT_PREP"（准备中）的标志，这能发现前后不一致的状态。
+
+```c
+	VM_BUG_ON(migratetype == -1);
+```
+3. 迁移类型必须是有效的，-1表示错误。（毕竟是ENUM）
+
+```c
+	if (likely(!is_migrate_isolate(migratetype)))
+		__mod_zone_freepage_state(zone, 1 << order, migratetype);
+```
+4. 如果要释放的不是隔离页，那就统计一下。
+
+```c
+	VM_BUG_ON_PAGE(pfn & ((1 << order) - 1), page);
+```
+5. 验证页面是否按order正确对齐。比如order=3时，pfn必须是8的倍数，否则说明传入参数有问题。
+
+```c
+	VM_BUG_ON_PAGE(bad_range(zone, page), page);
+```
+6. 确保页面确实属于这个zone的管理范围。
+
+```c
+continue_merging:
+	while (order < max_order) {
+		if (compaction_capture(capc, page, order, migratetype)) {
+			__mod_zone_freepage_state(zone, -(1 << order),
+								migratetype);
+			return;
+		}
+```
+`continue_merging`是BUDDY SYSTEM的合并逻辑，不难看的。
+`compaction_capture`：如果有`compaction`线程正在申请符合某种条件的页，然后我们现在的页正好符合该条件，那么就会直接分给那个线程使用，而非释放到FREELIST。
+
+```c
+		buddy_pfn = __find_buddy_pfn(pfn, order);
+		buddy = page + (buddy_pfn - pfn);
+```
+首先，先找到BUDDY页在哪。
+
+```c
+		if (!pfn_valid_within(buddy_pfn))
+			goto done_merging;
+		if (!page_is_buddy(page, buddy, order))
+			goto done_merging;
+```
+然后再确认：
+1. BUDDY页的位置不是在ZONE的HOLE（比如给设备留的地址），并且位置合法。
+2. BUDDY页的ORDER完全相同，在同一个ZONE，是否真的是BUDDY之类的。
+如果都对就继续，错了就直接结束合并，正式释放。
+
+```c
+		if (page_is_guard(buddy))
+			clear_page_guard(zone, buddy, order, migratetype);
+		else
+			del_page_from_free_list(buddy, zone, order);
+```
+如果是GUARD PAGE，那就把GUARD PAGE变成正常的BUDDY页，当然，是确认了GUARD PAGE没有存在的必要时。
+如果是普通BUDDY页的话，就直接从FREELIST中删掉就行了，以免其他CPU抢走我们的BUDDY页。
+
+注：`del_page_from_free_list()`内部会清除BUDDY标识，以此让其他抢走BUDDY页的CPU尽早失败。
+```c
+static inline void del_page_from_free_list(struct page *page, struct zone *zone,
+					   unsigned int order)
+{
+	/* clear reported state and update reported page count */
+	if (page_reported(page))
+		__ClearPageReported(page);
+
+	list_del(&page->lru);
+	__ClearPageBuddy(page);
+	set_page_private(page, 0);
+	zone->free_area[order].nr_free--;
+}
+```
+
+```c
+		combined_pfn = buddy_pfn & pfn;
+		page = page + (combined_pfn - pfn);
+		pfn = combined_pfn;
+		order++;
+	}
+```
+这里会计算哪个“当前页”还是“BUDDY页”的地址更小，然后把基址设置为较小的那个。
+当然，还要加一下ORDER，之后要用到。
+
+```c
+	if (order < MAX_ORDER - 1) {
+
+		if (unlikely(has_isolate_pageblock(zone))) {
+			int buddy_mt;
+
+			buddy_pfn = __find_buddy_pfn(pfn, order);
+			buddy = page + (buddy_pfn - pfn);
+			buddy_mt = get_pageblock_migratetype(buddy);
+
+			if (migratetype != buddy_mt
+					&& (is_migrate_isolate(migratetype) ||
+						is_migrate_isolate(buddy_mt)))
+				goto done_merging;
+		}
+		max_order = order + 1;
+		goto continue_merging;
+	}
+```
+`MAX_ORDER-1`是一个PAGEBLOCK的大小，PAGEBLOCK就是ZONE的页管理单位。
+这个主要是一个检查函数，如果不符合条件就直接释放。
+
+进入条件：该ZONE内有隔离块（大概率不会发生）
+1. 如果下一个BUDDY页和当前也不是同一个迁移类型
+2. 并且其中一个是隔离页
+TRUE结果：下一次是危险的，不准合并！
+FALSE结果：顶多只能再合并一次！
+
+注：不知为何，除了隔离页都是可以合并的。
+
+```c
+done_merging:
+	set_buddy_order(page, order);
+```
+这里就是最后一个LABEL了。
+这个函数的作用主要就是把`page`变成PRIVATE。
+
+```c
+	if (fpi_flags & FPI_TO_TAIL)
+		to_tail = true;
+```
+这里在`kfree()`路径下必然不触发。
+
+```c
+	else if (is_shuffle_order(order))
+		to_tail = shuffle_pick_tail();
+```
+如果是大ORDER的复合页，那么就会随机判断该不该添加至FREELIST尾部，主要是防预测攻击。
+
+```c
+	else
+		to_tail = buddy_merge_likely(pfn, buddy_pfn, page, order);
+```
+如果页还没有很大，那么就会智能决定是否要放到头部，因为页很有可能不久后又可以被合并了，大ORDER复合页就不行。
+
+```c
+	if (to_tail)
+		add_to_free_list_tail(page, zone, order, migratetype);
+	else
+		add_to_free_list(page, zone, order, migratetype);
+
+	if (!(fpi_flags & FPI_SKIP_REPORT_NOTIFY))
+		page_reporting_notify_free(order);
+}
+```
+这里就就是正式添加进FREELIST了，博主就不继续深入了，博主感觉理解到这里就已经够了。（懒）
+
 # 总结
-还没完成，不过博主想睡觉了...（倒下）
+就这样，做了几天终于做好了，博主重新写博客才发现自己对`kmalloc()`/`kfree()`的理解是如此的薄弱，甚至这篇博文的内容也是如此的敷衍，能略过的基本都略过了，虽然核心逻辑大致上是知道了...
+
+希望博主的笔记能帮助到一些准备接触Linux内存管理的新手们。
 
 ## 之后的打算
 博主之后打算重新整理一下这篇博文，因为感觉这样的结构有点乱，也不利于管理。
