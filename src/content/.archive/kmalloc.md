@@ -5,7 +5,7 @@ description: "开始学习Linux内存管理吧"
 image: "./kmalloc.png"
 tags: ["Memory Management", "Linux", "Read Code"]
 category: Kernel
-draft: false
+draft: true
 ---
 
 # 前言
