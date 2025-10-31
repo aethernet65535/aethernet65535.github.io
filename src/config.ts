@@ -76,10 +76,10 @@ export const siteConfig: SiteConfig = {
 
 		// 支持单张图片或图片数组，当数组长度 > 1 时自动启用轮播
 		src: {
-			desktop: [ // 35 张图片
+			desktop: [ // 25 张图片
 				"/assets/desktop-banner/d1.webp",
 				"/assets/desktop-banner/d2.webp",
-				"/assets/desktop-banner/d3.png",
+				"/assets/desktop-banner/d3.webp",
 				"/assets/desktop-banner/d4.webp",
 				"/assets/desktop-banner/d5.webp",
 				"/assets/desktop-banner/d6.webp",
@@ -102,16 +102,6 @@ export const siteConfig: SiteConfig = {
 				"/assets/desktop-banner/d23.webp",
 				"/assets/desktop-banner/d24.webp",
 				"/assets/desktop-banner/d25.webp",
-				"/assets/desktop-banner/d26.webp",
-				"/assets/desktop-banner/d27.webp",
-				"/assets/desktop-banner/d28.webp",
-				"/assets/desktop-banner/d29.webp",
-				"/assets/desktop-banner/d30.webp",
-				"/assets/desktop-banner/d31.webp",
-				"/assets/desktop-banner/d32.webp",
-				"/assets/desktop-banner/d33.webp",
-				"/assets/desktop-banner/d34.webp",
-				"/assets/desktop-banner/d35.webp",
 			], // 桌面横幅图片
 			mobile: [ // 18 张图片
 				"/assets/mobile-banner/m1.webp",
@@ -122,7 +112,7 @@ export const siteConfig: SiteConfig = {
 				"/assets/mobile-banner/m6.webp",
 				"/assets/mobile-banner/m7.webp",
 				"/assets/mobile-banner/m8.webp",
-				"/assets/mobile-banner/m9.jpg",
+				"/assets/mobile-banner/m9.webp",
 				"/assets/mobile-banner/m10.webp",
 				"/assets/mobile-banner/m11.webp",
 				"/assets/mobile-banner/m12.webp",
@@ -216,7 +206,7 @@ export const siteConfig: SiteConfig = {
 export const fullscreenWallpaperConfig: FullscreenWallpaperConfig = {
 	enable: true, // 启用全屏壁纸功能,非Banner模式下生效
 	src: {
-		desktop: [ // 35 张图片
+		desktop: [ // 25 张图片
 			"/assets/desktop-banner/d1.webp",
 			"/assets/desktop-banner/d2.webp",
 			"/assets/desktop-banner/d3.webp",
@@ -224,7 +214,7 @@ export const fullscreenWallpaperConfig: FullscreenWallpaperConfig = {
 			"/assets/desktop-banner/d5.webp",
 			"/assets/desktop-banner/d6.webp",
 			"/assets/desktop-banner/d7.webp",
-			"/assets/desktop-banner/d8.png",
+			"/assets/desktop-banner/d8.webp",
 			"/assets/desktop-banner/d9.webp",
 			"/assets/desktop-banner/d10.webp",
 			"/assets/desktop-banner/d11.webp",
@@ -242,16 +232,6 @@ export const fullscreenWallpaperConfig: FullscreenWallpaperConfig = {
 			"/assets/desktop-banner/d23.webp",
 			"/assets/desktop-banner/d24.webp",
 			"/assets/desktop-banner/d25.webp",
-			"/assets/desktop-banner/d26.webp",
-			"/assets/desktop-banner/d27.webp",
-			"/assets/desktop-banner/d28.webp",
-			"/assets/desktop-banner/d29.webp",
-			"/assets/desktop-banner/d30.webp",
-			"/assets/desktop-banner/d31.webp",
-			"/assets/desktop-banner/d32.webp",
-			"/assets/desktop-banner/d33.webp",
-			"/assets/desktop-banner/d34.webp",
-			"/assets/desktop-banner/d35.webp",
 		], // 桌面横幅图片
 		mobile: [ // 18 张图片
 			"/assets/mobile-banner/m1.webp",
@@ -262,7 +242,7 @@ export const fullscreenWallpaperConfig: FullscreenWallpaperConfig = {
 			"/assets/mobile-banner/m6.webp",
 			"/assets/mobile-banner/m7.webp",
 			"/assets/mobile-banner/m8.webp",
-			"/assets/mobile-banner/m9.jpg",
+			"/assets/mobile-banner/m9.webp",
 			"/assets/mobile-banner/m10.webp",
 			"/assets/mobile-banner/m11.webp",
 			"/assets/mobile-banner/m12.webp",
