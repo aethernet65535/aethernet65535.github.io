@@ -76,52 +76,11 @@ export const siteConfig: SiteConfig = {
 
 		// 支持单张图片或图片数组，当数组长度 > 1 时自动启用轮播
 		src: {
-			desktop: [ // 25 张图片
-				"/assets/desktop-banner/d1.webp",
-				"/assets/desktop-banner/d2.webp",
-				"/assets/desktop-banner/d3.webp",
-				"/assets/desktop-banner/d4.webp",
-				"/assets/desktop-banner/d5.webp",
-				"/assets/desktop-banner/d6.webp",
-				"/assets/desktop-banner/d7.webp",
-				"/assets/desktop-banner/d8.webp",
-				"/assets/desktop-banner/d9.webp",
-				"/assets/desktop-banner/d10.webp",
-				"/assets/desktop-banner/d11.webp",
-				"/assets/desktop-banner/d12.webp",
-				"/assets/desktop-banner/d13.webp",
-				"/assets/desktop-banner/d14.webp",
-				"/assets/desktop-banner/d15.webp",
-				"/assets/desktop-banner/d16.webp",
-				"/assets/desktop-banner/d17.webp",
-				"/assets/desktop-banner/d18.webp",
-				"/assets/desktop-banner/d19.webp",
-				"/assets/desktop-banner/d20.webp",
-				"/assets/desktop-banner/d21.webp",
-				"/assets/desktop-banner/d22.webp",
-				"/assets/desktop-banner/d23.webp",
-				"/assets/desktop-banner/d24.webp",
-				"/assets/desktop-banner/d25.webp",
+			desktop: [
+				"/assets/desktop-banner/d1.png",
 			], // 桌面横幅图片
-			mobile: [ // 18 张图片
-				"/assets/mobile-banner/m1.webp",
-				"/assets/mobile-banner/m2.webp",
-				"/assets/mobile-banner/m3.webp",
-				"/assets/mobile-banner/m4.webp",
-				"/assets/mobile-banner/m5.webp",
-				"/assets/mobile-banner/m6.webp",
-				"/assets/mobile-banner/m7.webp",
-				"/assets/mobile-banner/m8.webp",
-				"/assets/mobile-banner/m9.webp",
-				"/assets/mobile-banner/m10.webp",
-				"/assets/mobile-banner/m11.webp",
-				"/assets/mobile-banner/m12.webp",
-				"/assets/mobile-banner/m13.webp",
-				"/assets/mobile-banner/m14.webp",
-				"/assets/mobile-banner/m15.webp",
-				"/assets/mobile-banner/m16.webp",
-				"/assets/mobile-banner/m17.webp",
-				"/assets/mobile-banner/m18.webp",
+			mobile: [
+				"/assets/mobile-banner/m1.png",
 			], // 移动横幅图片
 		}, // 使用本地横幅图片
 
@@ -206,52 +165,11 @@ export const siteConfig: SiteConfig = {
 export const fullscreenWallpaperConfig: FullscreenWallpaperConfig = {
 	enable: true, // 启用全屏壁纸功能,非Banner模式下生效
 	src: {
-		desktop: [ // 25 张图片
-			"/assets/desktop-banner/d1.webp",
-			"/assets/desktop-banner/d2.webp",
-			"/assets/desktop-banner/d3.webp",
-			"/assets/desktop-banner/d4.webp",
-			"/assets/desktop-banner/d5.webp",
-			"/assets/desktop-banner/d6.webp",
-			"/assets/desktop-banner/d7.webp",
-			"/assets/desktop-banner/d8.webp",
-			"/assets/desktop-banner/d9.webp",
-			"/assets/desktop-banner/d10.webp",
-			"/assets/desktop-banner/d11.webp",
-			"/assets/desktop-banner/d12.webp",
-			"/assets/desktop-banner/d13.webp",
-			"/assets/desktop-banner/d14.webp",
-			"/assets/desktop-banner/d15.webp",
-			"/assets/desktop-banner/d16.webp",
-			"/assets/desktop-banner/d17.webp",
-			"/assets/desktop-banner/d18.webp",
-			"/assets/desktop-banner/d19.webp",
-			"/assets/desktop-banner/d20.webp",
-			"/assets/desktop-banner/d21.webp",
-			"/assets/desktop-banner/d22.webp",
-			"/assets/desktop-banner/d23.webp",
-			"/assets/desktop-banner/d24.webp",
-			"/assets/desktop-banner/d25.webp",
+		desktop: [
+			"/assets/desktop-banner/d1.png",
 		], // 桌面横幅图片
-		mobile: [ // 18 张图片
-			"/assets/mobile-banner/m1.webp",
-			"/assets/mobile-banner/m2.webp",
-			"/assets/mobile-banner/m3.webp",
-			"/assets/mobile-banner/m4.webp",
-			"/assets/mobile-banner/m5.webp",
-			"/assets/mobile-banner/m6.webp",
-			"/assets/mobile-banner/m7.webp",
-			"/assets/mobile-banner/m8.webp",
-			"/assets/mobile-banner/m9.webp",
-			"/assets/mobile-banner/m10.webp",
-			"/assets/mobile-banner/m11.webp",
-			"/assets/mobile-banner/m12.webp",
-			"/assets/mobile-banner/m13.webp",
-			"/assets/mobile-banner/m14.webp",
-			"/assets/mobile-banner/m15.webp",
-			"/assets/mobile-banner/m16.webp",
-			"/assets/mobile-banner/m17.webp",
-			"/assets/mobile-banner/m18.webp",
+		mobile: [ 
+			"/assets/mobile-banner/m1.png",
 		], // 移动横幅图片
 	}, // 使用本地横幅图片
 	position: "center", // 壁纸位置，等同于 object-position
