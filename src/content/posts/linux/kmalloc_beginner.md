@@ -1,7 +1,7 @@
 ---
 title: "入门级：kmalloc()"
 published: 2025-10-30
-description: "了解Linux的物理连续内存分配"
+description: "浅谈`kmalloc()`的作用"
 image: "./kmalloc_beginner.png"
 tags: ["内存管理", "Linux", "入门级"]
 category: Kernel
