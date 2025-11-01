@@ -1,6 +1,6 @@
 ---
 title: "入门级：kfree()"
-published: 2025-10-31
+published: 2025-11-01
 description: "浅谈`kfree()`的作用"
 tags: ["内存管理", "Linux", "入门级"]
 category: Kernel
@@ -90,4 +90,13 @@ printk(KERN_DEBUG "uaf_test: ptr[string] = %s\n", ptr);
 不过用`vmalloc()`的话我就不确定了，毕竟`vmalloc()`的地址转换较为复杂，而`kmalloc()`返回的虚拟地址则是永远指向固定的那一个字节的。 <br>
 不过，即使用的是`vmalloc()`，也绝对不要写UAF行为。
 
-最后编辑时间：2025/10/31 PM09:43
+
+
+# 3. 总结
+`kfree()`不看代码的话，就不比`kmalloc()`难，但是如果看代码的话，我觉得比`kmalloc()`更难理解，这主要是因为SLAB分配器的关系。
+
+如果感兴趣的话，可以去看下一篇，原理篇。
+
+
+
+最后编辑时间：2025/11/1 AM09:50
