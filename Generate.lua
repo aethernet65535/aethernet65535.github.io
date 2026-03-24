@@ -18,7 +18,7 @@ local modTemplate	= require("Template");
 local gListFileName <const>	= "ArticleList.lua";
 local gIndexTplName <const>	= "index.tpl.html";
 local gArtTplName <const>	= "Article.tpl.html";
-local gOutputDir <const>	= "./output/";
+local gOutputDir <const>    = "./docs/";
 local gSrcDir <const>		= "./src/";
 
 local listFile = assert(io.open(gListFileName,"r"),
