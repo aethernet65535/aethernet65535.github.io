@@ -21,7 +21,7 @@
 导航 (Navigation)
 -----------------
 
-* <a href="./about.html" style="text-decoration: none; color: inherit;">[关于我 / About Me]</a>
+* <a href="./about.html" style="text-decoration: none;">[关于我 / About Me]</a>
 
 
 文章列表 (Articles)
@@ -35,7 +35,7 @@ end
 for _, article in ipairs(tpl.arg)
 do
     local s = string.format([[
-* <a href="%s" style="text-decoration: none; color: inherit;">%-20s</a> (Publish: %s)]],
+* <a href="%s" style="text-decoration: none;;">%-20s</a> (Publish: %s)]],
                 article.name .. ".html",
                 "[" .. article.title .. "]",
                 os.date("%Y-%m-%d", article.date));
