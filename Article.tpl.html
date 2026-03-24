@@ -1,0 +1,41 @@
+<!--
+	Blog
+	File:/Article.tpl.html
+	Date:2023.04.16
+	By MIT License.
+	Copyright (c) 2022-2023 Ziyao.All rights reserved.
+-->
+
+<html>
+	<head>
+		<title>梓瑶233 - $$tpl.result[1] = tpl.arg.title;$$</title>
+		<script type = "text/javascript">
+			MathJax = {
+				tex: {
+					inlineMath: [['$','$'],['\\(','\\']]
+				     }
+				  };
+		</script>
+		<script type = "text/javascript" id = "MathJax-script" async
+			src = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+		</script>
+	</head>
+
+	<body>
+		$$ tpl.result[1] = tpl.arg.content; $$
+		<div style = "text-align: right">
+			Publish: $$
+tpl.result[1] = os.date("%Y-%m-%d", tpl.arg.date);
+$$
+			$$
+tpl.result[1] = tpl.arg.change and
+	("</br>Last Change: %s"):format(tpl.arg.change)
+	or "";
+$$
+		</div>
+		<div style = "text-align: center">
+			如无特殊说明，本站所有内容以 CC-BY-SA 4.0 协议发布</br>
+			<a href="./index.html">GO BACK</a>
+		</div>
+	</body>
+</html>
