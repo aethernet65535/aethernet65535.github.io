@@ -1,9 +1,9 @@
 {
 	{
 		name	= "about",
-		title	= "About",
-		date	= "2022-01-30",
-		change	= "2023-11-29",
+		title	= "about",
+		date	= "2026-03-24",
+		change	= "2026-03-24",
 	},
 --[[
 	{
