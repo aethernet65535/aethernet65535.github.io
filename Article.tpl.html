@@ -49,24 +49,23 @@
 		</script>
 	</head>
 
-	<body>
-		$$ tpl.result[1] = tpl.arg.content; $$
+    <body>
+        <pre><code class="language-text">$$ tpl.result[1] = tpl.arg.content; $$</code></pre>
 
         <hr>
 
-    <div style="text-align: left">
-        <pre><code class="language-text">
-Publish: $$
+        <div style="text-align: left">
+            <pre><code class="language-text">Publish: $$
 tpl.result[1] = os.date("%Y-%m-%d", tpl.arg.date);
 $$$$
 tpl.result[1] = tpl.arg.change and
 ("\nLast Change: %s"):format(tpl.arg.change)
 or "";
-$$
-        </code></pre>
-    </div>
-		<div style = "text-align: left">
-			<a href="./index.html">Go Back</a>
-		</div>
-	</body>
+$$</code></pre>
+        </div>
+
+        <div style="text-align: left">
+            <a href="./index.html" style="color: #0000EE; text-decoration: underline;">Go Back</a>
+        </div>
+    </body>
 </html>
