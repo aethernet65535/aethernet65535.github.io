@@ -10,9 +10,9 @@
 主要研究与兴趣（Interests）
 --------------------------
 
-- Linux 
-- DAMON (Data Access MONitoring and Access-aware System Operations) 
-- 内存管理
+- Linux 内核（Linux Kernel）
+- DAMON 子系统(Data Access MONitoring) 
+- 内存管理（Memory Management）
 
 关于本站（About This Site）
 --------------------------

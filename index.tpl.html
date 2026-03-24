@@ -7,35 +7,41 @@
 -->
 
 <html>
-	<head>
-		<meta charset = "utf-8" />
-		<title>刘睿彦</title>
-	</head>
+    <head>
+        <meta charset = "utf-8" />
+        <title>刘睿彦 (Liew Rui Yan)</title>
+    </head>
 
-	<body>
-		<h1>Blog of Liew Rui Yan</h1>
-		<p>万物皆有裂痕，那是光照进来的地方。</p>
-		<ul>
-		<li><a href="./about.html">关于我</a></li>
-		</ul>
-		<h2>文章列表</h2>
-		<ul>
-		$===$
+    <body>
+        <pre><code class="language-text">Blog of Liew Rui Yan
+====================
+
+万物皆有裂痕，那是光照进来的地方。
+
+导航 (Navigation)
+-----------------
+
+* <a href="./about.html" style="text-decoration: none; color: inherit;">[关于我 / About Me]</a>
+
+
+文章列表 (Articles)
+-------------------
+$===$
 local gen = function(s)
-	table.insert(tpl.result,s);
-	return;
+    table.insert(tpl.result, s);
+    return;
 end
 
-for _,article in ipairs(tpl.arg)
+for _, article in ipairs(tpl.arg)
 do
-	local s = string.format([[
-<li><a href="%s">%s</a></li>
-]],
-				article.name .. ".html",
-				article.title);
-	gen(s);
+    local s = string.format([[
+* <a href="%s" style="text-decoration: none; color: inherit;">%-20s</a> (Publish: %s)]],
+                article.name .. ".html",
+                "[" .. article.title .. "]",
+                os.date("%Y-%m-%d", article.date));
+    gen(s);
 end
-		$===$
-		</ul>
-	</body>
+$===$
+</code></pre>
+    </body>
 </html>
