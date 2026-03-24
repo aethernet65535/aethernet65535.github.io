@@ -78,25 +78,23 @@ do
 	-- Logging
 	io.write(string.format("Generating %s...", name));
 
-	--[[	Convert Markdown with md2html	]]
-	local pipe = io.popen(string.format(
-	[[
-		/usr/bin/env md2html --fstrikethrough %s%s.md
-	]],
-					    gSrcDir,
-					    name),
-			      "r");
+    --[[    Instead of md2html, we read the raw text for a "lore.kernel" style    ]]
+    local srcPath = string.format("%s%s.md", gSrcDir, name);
+    local f = assert(io.open(srcPath, "r"), "Cannot open source file " .. srcPath);
+    local rawText = f:read("a");
+    f:close();
 
-	local htmlSrc = pipe:read("a");
-	pipe:close();
+    -- 进行简单的 HTML 转义，防止正文里的符号破坏页面结构
+    local htmlSrc = rawText:gsub("&", "&amp;"):gsub("<", "&lt;"):gsub(">", "&gt;");
 
-	--[[	Template replacement	]]
-	local tplArg = {
-				title	= list[name].title,
-				content = htmlSrc,
-				date	= list[name].date,
-				change	= list[name].change,
-		       };
+    --[[    Template replacement    ]]
+    local tplArg = {
+                title       = list[name].title,
+                content     = htmlSrc,
+                date        = list[name].date,
+                change      = list[name].change,
+               };
+
 	local resultHtml = articleTpl:replace(tplArg);
 	local path = string.format("%s%s.html", gOutputDir,name);
 	local outputFile = io.open(path,"w");
