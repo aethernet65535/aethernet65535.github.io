@@ -35,7 +35,7 @@ end
 for _, article in ipairs(tpl.arg)
 do
     local s = string.format([[
-* <a href="%s" style="text-decoration: none;;">%-20s</a> (Publish: %s)]],
+* <a href="%s" style="text-decoration: none;;">%-20s</a> %s]],
                 article.name .. ".html",
                 "[" .. article.title .. "]",
                 os.date("%Y-%m-%d", article.date));
