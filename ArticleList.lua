@@ -1,7 +1,7 @@
 {
 	{
-		name	= "about",
-		title	= "about",
+		name	= "about-me",
+		title	= "about-me",
 		date	= "2026-03-24",
 		change	= "2026-03-24",
 	},
