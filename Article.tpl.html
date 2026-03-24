@@ -23,7 +23,10 @@
 
 	<body>
 		$$ tpl.result[1] = tpl.arg.content; $$
-		<div style = "text-align: right">
+
+        <hr>
+
+		<div style = "text-align: left">
 			Publish: $$
 tpl.result[1] = os.date("%Y-%m-%d", tpl.arg.date);
 $$
@@ -33,9 +36,9 @@ tpl.result[1] = tpl.arg.change and
 	or "";
 $$
 		</div>
-		<div style = "text-align: center">
+		<div style = "text-align: left">
 			如无特殊说明，本站所有内容以 CC-BY-SA 4.0 协议发布</br>
-			<a href="./index.html">GO BACK</a>
+			<a href="./index.html">Go Back</a>
 		</div>
 	</body>
 </html>
