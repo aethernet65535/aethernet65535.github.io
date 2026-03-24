@@ -26,17 +26,17 @@
 
         <hr>
 
-		<div style = "text-align: left">
-            <pre style="background-color: #f4f4f4; padding: 10px; border-radius: 5px; border: 1px solid #ddd; display: inline-block;"><code>
-                Publish: $$
-                tpl.result[1] = os.date("%Y-%m-%d", tpl.arg.date);
-                $$
-                $$
-                tpl.result[1] = tpl.arg.change and
-                ("</br>Last Change: %s"):format(tpl.arg.change)
-                or "";
-            $$</code></pre>
-		</div>
+    <div style="text-align: left">
+        <pre style="background-color: #f4f4f4; padding: 10px; border-radius: 5px; border: 1px solid #ddd; display: inline-block;"><code>
+Publish: $$
+tpl.result[1] = os.date("%Y-%m-%d", tpl.arg.date);
+$$$$
+tpl.result[1] = tpl.arg.change and
+("\nLast Change: %s"):format(tpl.arg.change)
+or "";
+$$
+        </code></pre>
+    </div>
 		<div style = "text-align: left">
 			<a href="./index.html">Go Back</a>
 		</div>
