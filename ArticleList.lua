@@ -5,6 +5,7 @@
 		date	= "2022-01-30",
 		change	= "2023-11-29",
 	},
+--[[
 	{
 		name	= "links",
 		title	= "友情链接",
@@ -96,7 +97,6 @@
 		title	= "Cataclysm-DDA 入门",
 		date	= "2023-12-31",
 	},
---[[
 	I'm a pigeon.....
 	{
 		name	= "gcc_development_on_super_slow_arch",
@@ -108,7 +108,6 @@
 		title	= "LLVM 交叉编译与 bootstrap: riscv64 实践",
 		date	= "2024-10-19",
 	},
---]]
 	{
 		name	= "linux_boot_protocol",
 		title	= "How Linux Boots: the Linux Boot Protocol" ..
@@ -130,4 +129,5 @@
 		title	= "半夜的年终总结：我的 2025",
 		date	= "2026-02-16",
 	},
+--]]
 }
