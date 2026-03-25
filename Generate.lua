@@ -79,7 +79,7 @@ do
 	io.write(string.format("Generating %s...", name));
 
     --[[    Instead of md2html, we read the raw text for a "lore.kernel" style    ]]
-    local srcPath = string.format("%s%s.md", gSrcDir, name);
+    local srcPath = string.format("%s%s.txt", gSrcDir, name);
     local f = assert(io.open(srcPath, "r"), "Cannot open source file " .. srcPath);
     local rawText = f:read("a");
     f:close();

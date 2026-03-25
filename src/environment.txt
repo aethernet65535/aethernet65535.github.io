@@ -1,0 +1,19 @@
+我的环境（My environment）
+=========================
+
+这里主要记录着我使用的一些好工具。
+
+硬件（Hardware）
+---------------
+
+Laptop: Lenovo Ideapad 5 Pro 16ACH6
+    CPU: AMD Ryzen 5 5600H
+    RAM: 16GB DDR
+
+软件（Software）
+---------------
+
+OS: Arch GNU/Linux
+Editor: Neovim
+Email: Gmail-Web, git-email
+VM: virtme-ng
