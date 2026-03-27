@@ -1,0 +1,134 @@
+<!--
+	Blog
+	File:/Article.tpl.html
+	Date:2023.04.16
+	By MIT License.
+	Copyright (c) 2022-2023 Ziyao.All rights reserved.
+-->
+
+<html>
+	<head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <style>
+            body { 
+                margin: 20px;
+                line-height: 1.4;
+                background-color: #fff; 
+                color: #000; 
+            }
+
+            pre { 
+                white-space: pre-wrap;
+                word-wrap: break-word;
+                font-family: monospace;
+                font-size: 1rem;
+                margin: 0;
+            }
+
+            @media (min-width: 800px) {
+                body { 
+                    max-width: 900px;
+                    margin-left: 40px;
+                    margin-right: auto;
+                }
+                pre { font-size: 1.1rem; }
+            }
+        </style>
+
+		<title>我的三月</title>
+		<script type = "text/javascript">
+			MathJax = {
+				tex: {
+					inlineMath: [['$','$'],['\\(','\\']]
+				     }
+				  };
+		</script>
+		<script type = "text/javascript" id = "MathJax-script" async
+			src = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+		</script>
+	</head>
+
+    <body>
+<pre><code class="language-text">我的三月
+=======
+
+2026 年的三月对我来说是一个特别的一个月，我在这个月收获了特别多，也同样
+的做了非常多笨笨的事情。
+
+“万物皆有裂痕，那是光照进来的地方。”
+
+TL;DR
+-----
+
+- 成为了“准” DAMON Contributor
+- 学习到了 LKML 内核的规则
+
+详情
+---
+
+在 3 月 8 日，我逛内核社区 [1] 时，发现到了一个新的字眼，叫做 DAMON。我
+就去询问了 LLM 这是什么。之后，我发现这是一个新的东西，是 2021 左右出来
+的。想了解 DAMON 的话，可以去尝试使用 damo [2]，并搭配源码和文档来学习，
+维新派要使用 LLM 也完全没有问题，只要还有独立思考的能力。
+
+好，继续说。我发现了这个 DAMON 是一个有用的东西之后，我就去读文档了，然
+后我发现文档中有一个 Typo。当时我高兴的不得了，因为我终于可以正式可以给
+Linux 贡献了呀。然后我就去开始学习要怎么使用 git send-email 来发送 Patch，
+一开始对我来说非常困难，不过最后也是发送成功了。[3]
+
+发送了之后，我突然发现其实 Maintainer 自己已经在几个小时前修复了。我就赶
+紧发送一封新邮件（回复）来道歉，事后我甚至发现我连名字都写错了（邮件中写
+真名，但是发送时是网名）。
+
+但是这位叫 SeongJae Park 的 Maintainer 不仅没有因为我的冒失而责怪我。相
+反，他甚至和我说 Patch 出现冲突是非常正常的，没有道歉的必要。
+看到 SJ 前辈的回复后，我认为他是一位特别好、特别温柔的人，所以我就决定说，
+一定要好好学习 DAMON，以此来给他维护的子系统做贡献，不管是文档还是代码。
+
+在这个月内，SJ 前辈教会了我许多关于内核社区的潜规则。我也在这个月修复了
+不少东西，包括 2 个 admin-guide 的文档 [4][5]、1 个 ilog2() 的性能提升
+[6]。现在我还在折腾一个异步提交转为同步提交的任务，主要是让报错反馈更加
+及时。不过我已经做了 7 个版本了，我对自己感到非常不满意，我认为这是不专
+业的表现。
+
+而且在最近，Linux 社区出现了一位叫 Josh Law 的人。他似乎是 Openclaw Bot
+而已。他在 11 天内发送了近 300 个 Patch，而且还横跨各个子系统。许多
+Maintainer 都认为他只是一个 Bot 而已，甚至考虑封禁他。
+
+而就在刚刚，我提交了一个 Patch [7]，这个 Patch 没有修复任何东西。我本误
+以为它修复了某个问题，最后经过我的测试，证明我是错的了。但是在发送前，我
+在测试时完全没有考虑过将它移除后是否会有问题。现在 SJ 前辈已经几个小时没
+有回复我了，虽然不排除他是进入了心流，正在修复某个死锁问题。但是我还是担
+心他会觉得我是一个很不负责任的贡献者，或者更糟的，前辈是否会认为我是像
+Josh Law 一样的 AI Bot 呢？
+
+但是，这些焦虑什么都改变不了，我唯一能做的，就是等待 [8]。并且在等待的过
+程中，不断地提升自我。这样才可以继续为 DAMON 做贡献，我就当作 SJ 前辈只
+是有事情，正在忙而已。
+
+总的来说，这是一个收获非常多的一个月，我希望在下一个月时，我的 Patch 能
+从 AKPM 的树进入到 Linus 的树，正式合并主线，使我成为一名正式的
+Contributor。如果我成为 Linux Contributor 的话，我会在 HHKB 打折时购入一
+把，我认为这是一把只有黑客才能拥有的键盘。
+
+[1] https://lore.kernel.org/linux-mm
+[2] https://github.com/damonitor/damo
+[3] https://lore.kernel.org/20260308021811.41199-1-aethernet65535@gmail.com
+[4] https://lore.kernel.org/20260315162945.80994-1-sj@kernel.org
+[5] https://lore.kernel.org/20260320052428.213230-1-aethernet65535@gmail.com
+[6] https://lore.kernel.org/20260321005248.6114-1-aethernet65535@gmail.com
+[7] https://lore.kernel.org/20260327062627.66426-1-aethernet65535@gmail.com
+[8] https://www.reddit.com/r/Stoicism/comments/1bnidp3/the_dichotomy_of_control
+</code></pre>
+        <hr>
+        <div style="text-align: left">
+<pre><code class="language-text">Publish: 2026-03-28
+Last Change: 2026-03-28</code></pre>
+        </div>
+
+        <div style="text-align: left">
+            <a href="./index.html" style="color: #0000EE; text-decoration: none;">Go Back</a>
+        </div>
+    </body>
+</html>
