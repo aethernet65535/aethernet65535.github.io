@@ -4,7 +4,8 @@
 2026 年的三月对我来说是一个特别的一个月，我在这个月收获了特别多，也同样
 的做了非常多笨笨的事情。
 
-“万物皆有裂痕，那是光照进来的地方。”
+“事情分为两类，一类是您能控制的，一类是您无法控制的。接受您不能控制的，
+控制能控制的。”
 
 TL;DR
 -----
@@ -51,7 +52,7 @@ Maintainer 都认为他只是一个 Bot 而已，甚至考虑封禁他。
 心他会觉得我是一个很不负责任的贡献者，或者更糟的，前辈是否会认为我是像
 Josh Law 一样的 AI Bot 呢？
 
-但是，这些焦虑什么都改变不了，我唯一能做的，就是等待 [8]。并且在等待的过
+但是，这些焦虑什么都改变不了，我唯一能做的，就是等待。并且在等待的过
 程中，不断地提升自我。这样才可以继续为 DAMON 做贡献，我就当作 SJ 前辈只
 是有事情，正在忙而已。
 
@@ -67,4 +68,3 @@ Contributor。如果我成为 Linux Contributor 的话，我会在 HHKB 打折�
 [5] https://lore.kernel.org/20260320052428.213230-1-aethernet65535@gmail.com
 [6] https://lore.kernel.org/20260321005248.6114-1-aethernet65535@gmail.com
 [7] https://lore.kernel.org/20260327062627.66426-1-aethernet65535@gmail.com
-[8] https://www.reddit.com/r/Stoicism/comments/1bnidp3/the_dichotomy_of_control
