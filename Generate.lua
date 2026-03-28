@@ -9,7 +9,7 @@
 ]]
 
 local io		= require("io");
-local string		= require("string");
+local string	= require("string");
 local os		= require("os");
 local table		= require("table");
 

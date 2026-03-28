@@ -61,17 +61,16 @@ local gen = function(s)
     return;
 end
 
-for _, article in ipairs(tpl.arg)
-do
-    local s = string.format([[
-    <div style="display: flex; max-width: 400px;">
-        <span style="flex: 0 0 10px;">*</span>
-        <a href="%s" style="text-decoration: none; flex: 1;">[%s]</a>
-        <span style="font-family: monospace;">%s</span>
-    </div>]],
-        article.name .. ".html",
-        article.title,
-        os.date("%Y-%m-%d", article.date));
+for _, article in ipairs(tpl.arg) do
+local s = '<div style="display: flex; max-width: 400px;">'
+        .. '<span style="flex: 0 0 10px;">*</span>'
+        .. '<a href="' .. article.name .. '.html" '
+        .. 'style="text-decoration: none; flex: 1;">'
+        .. '[' .. article.title .. ']</a>'
+        .. '<span style="font-family: monospace;">' 
+        .. os.date("%Y-%m-%d", article.date) .. '</span>'
+        .. '</div>'
+
     gen(s);
 end
 $===$
