@@ -10,7 +10,7 @@
 TL;DR
 -----
 
-- 成为了“准” DAMON Contributor
+- 成为了“准” Linux Contributor
 - 学习到了 LKML 内核的规则
 
 详情
