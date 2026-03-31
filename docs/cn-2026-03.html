@@ -95,28 +95,23 @@ Linux 贡献了呀。然后我就去开始学习要怎么使用 git send-email �
 
 而且在最近，Linux 社区出现了一位叫 Josh Law 的人。他似乎是 Openclaw Bot
 而已。他在 11 天内发送了近 300 个 Patch，而且还横跨各个子系统。许多
-Maintainer 都认为他只是一个 Bot 而已，甚至考虑封禁他。
+Maintainer 都认为他只是一个 Bot 而已，甚至考虑封禁他。当然，这个和我说没
+什么关系就是了，只是他的出现让我也害怕我会被当成 Bot 什么的。
 
-而就在刚刚，我提交了一个 Patch [7]，这个 Patch 没有修复任何东西。我本误
-以为它修复了某个问题，最后经过我的测试，证明我是错的了。但是在发送前，我
-在测试时完全没有考虑过将它移除后是否会有问题。现在 SJ 前辈已经几个小时没
-有回复我了，虽然不排除他是进入了心流，正在修复某个死锁问题。但是我还是担
-心他会觉得我是一个很不负责任的贡献者，或者更糟的，前辈是否会认为我是像
-Josh Law 一样的 AI Bot 呢？
+我最近也提交了个没有修复任何东西的 Patch [7]。我本误以为它修复了某个问题，
+最后经过我的测试，证明了它什么都没有修复。但在发送前的测试，我完全没有想
+过移除了会不会变不一样，我只是以为修复了而已，因为有报错嘛，我也忘了当时
+怎么想的 w(ﾟДﾟ)w。不过 SJ 前辈回复我了，确实没有责怪我的冒失。最后我们也讨
+论出了一个更好的解决“因参数错误导致 kdamond 意外终止”的方法。我发了
+一个 Patch [8]，不过这个 Patch 会是属于 4 月的事情了。
 
-但是，这些焦虑什么都改变不了，我唯一能做的，就是等待。并且在等待的过
-程中，不断地提升自我。这样才可以继续为 DAMON 做贡献，我就当作 SJ 前辈只
-是有事情，正在忙而已。
-
-刚刚 SJ 前辈回复我了，确实没有责怪我的冒失，但是有点遗憾的是，他似乎没有
-看到我的 Self-Reply。所以我就发了个感谢的回信，然后向他说明我的
-Self-Reply 都说了什么，还带了两链接，就是去那两个 Self-Reply 的。主要目
-标是希望能降低因用户输入导致的 kdamond 意外终止。
-
-虽然有点冒犯人家的隐私，不过我似乎发现了一个有趣的规律。SJ 前辈似乎只会
-在 UTC+8 的晚上 10 点和早上 8 点这两个时间回复，当然也有可能是因为 DAMON
-本身就没太多活跃贡献者，所以他就比较 Chill。不过发现这一规律后，我就不需
-要一直等回复了，而是只在这两个时间点查一下邮箱。
+不过由于我修了那些检测参数错误的判断，所以发现了一个问题————如果 kdamond
+意外终止，那么它将再也不能启动，除非重启电脑，或者一些更麻烦的方法。所以
+我就又发了一个 Patch [9]，用来让意外终止的 kdamond 也能重启。我想了不少
+解决办法，至少有 3 个。截至目前为止，我脑子里最好的解决办法是————当用户
+输入 Y 时，如果 kdamond 已经终止了，那就直接再开一个新的；当用户用 cat
+查看 'enabled' 时，如果目前是 Y，那么就查看 kdamond 是否已经终止了，如果
+是的话，那就修改为 N 后再返回结果。
 
 总的来说，这是一个收获非常多的一个月，我希望在下一个月时，我的 Patch 能
 从 AKPM 的树进入到 Linus 的树，正式合并主线，使我成为一名正式的
@@ -130,11 +125,22 @@ Contributor。如果我成为 Linux Contributor 的话，我会在 HHKB 打折�
 [5] https://lore.kernel.org/20260320052428.213230-1-aethernet65535@gmail.com
 [6] https://lore.kernel.org/20260321005248.6114-1-aethernet65535@gmail.com
 [7] https://lore.kernel.org/20260327062627.66426-1-aethernet65535@gmail.com
+[8] https://lore.kernel.org/20260331073231.30060-1-aethernet65535@gmail.com
+[9] https://lore.kernel.org/20260330164347.12772-1-aethernet65535@gmail.com
+---
+
+3 月合并进 sj/damon/next 的补丁：
+b7258fe5de09 mm/damon: add synchronous commit for commit_inputs
+18ca56198ee2 mm/damon/ops-common: optimize damon_hot_score() using ilog2()
+cfb3a14c057e Docs/mm/damon: document min_nr_regions constraint and rationale
+999be0959f89 Docs/mm/damon: document exclusivity of special-purpose modules
+
+总计 4 个，我不确定真的合并主线的话，commit 号会不会变。(。﹏。*)
 </code></pre>
         <hr>
         <div style="text-align: left">
 <pre><code class="language-text">Publish: 2026-03-28
-Last Change: 2026-03-28</code></pre>
+Last Change: 2026-04-01</code></pre>
         </div>
 
         <div style="text-align: left">
