@@ -1,0 +1,97 @@
+<!--
+	Blog
+	File:/Article.tpl.html
+	Date:2023.04.16
+	By MIT License.
+	Copyright (c) 2022-2023 Ziyao.All rights reserved.
+-->
+
+<html>
+	<head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <style>
+            body { 
+                margin: 20px;
+                line-height: 1.4;
+                background-color: #fff; 
+                color: #000; 
+            }
+
+            pre { 
+                white-space: pre-wrap;
+                word-wrap: break-word;
+                font-family: monospace;
+                font-size: 1rem;
+                margin: 0;
+            }
+
+            @media (min-width: 800px) {
+                body { 
+                    max-width: 900px;
+                    margin-left: 40px;
+                    margin-right: auto;
+                }
+                pre { font-size: 1.1rem; }
+            }
+        </style>
+
+		<title>virtme-ng</title>
+		<script type = "text/javascript">
+			MathJax = {
+				tex: {
+					inlineMath: [['$','$'],['\\(','\\']]
+				     }
+				  };
+		</script>
+		<script type = "text/javascript" id = "MathJax-script" async
+			src = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+		</script>
+	</head>
+
+    <body>
+<pre><code class="language-text">[工具推荐] virtme-ng
+====================
+
+在做内核开发时，我们常常需要测试自己写的修复是否能够正常运行，但是使用
+QEMU 又需要经过一些复杂的配置才能启动自定义 Linux 内核。
+
+对于有需要快速编译 + 测试的人来说，可以试试这一款名为 virtme-ng 的工具。
+
+Swap - 交换空间
+---------------
+
+不知为何，我在 virtme-ng 上无法使用 Swap。我目前的 Workaround 是用 ZRAM
+代替。对比 Swap 的话好设置不少：
+
+    # modprobe zram
+    # echo &lt;size&gt; | sudo tee /sys/block/zram0/disksizeA
+    # mkswap /dev/zram0
+    # swapon /dev/zram0
+
+如果无法如预期地使用的话，可能是因为内核没有编译 ZRAM，请检查以下配置：
+
+    -&gt; Device Drivers
+      -&gt; Block devices
+        -&gt; Compressed RAM block device support
+        -&gt; zstd compression support (optional)
+
+请确保 Compressed RAM block device support 已经启用，如果有需要的话可以
+顺便启用 zstd compression support。
+
+项目相关链接
+------------
+
+Github: https://github.com/arighi/virtme-ng
+</code></pre>
+        <hr>
+        <div style="text-align: left">
+<pre><code class="language-text">Publish: 2026-08-29
+Last Change: 2026-08-29</code></pre>
+        </div>
+
+        <div style="text-align: left">
+            <a href="./index.html" style="color: #0000EE; text-decoration: none;">Go Back</a>
+        </div>
+    </body>
+</html>
