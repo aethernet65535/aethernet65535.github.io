@@ -1,0 +1,49 @@
+怎么看？
+=======
+
+[Z] - 进度零
+[W] - 开发中
+[S] - 已发送
+[D] - 讨论中
+[R] - 待发送
+
+做好的去哪了？
+--------------
+
+做好了自然没必要留在 TODO List 啦 o(*≧▽≦)ツ
+不过我也有可能会写 [DONE]，小概率事件。
+
+DAMON
+=====
+
+[R] - Bug: fix unconditionally skip last region v2
+[W] - Test: avoid unconditionally skip last region
+
+一个超级难触发、影响超级小的 Bug。然后，还得写一个 KUnit Test，目前只剩
+下 Commit Message 没写而已。
+
+---
+
+[W] - Bug: fix quota could not be set to zero
+
+影响较小的 Bug，会导致小量的不必要应用。
+
+---
+
+[W] - Bug: treat zero-region target as invalid target
+
+影响较小的 Bug，会导致不必要的循环检测。本补丁将增加通用的 Invalid 条件，
+以此避免进入应用检测的循环。
+
+---
+
+[W] - Optimize: use wait_event() replace ctx->pause polling
+
+较小的优化，补丁同样也很小。不过，在发送前，需要先和维护者讨论是否有必要
+做这一改进。
+
+Linux-Kernel-Internals/MM/DAMON
+===============================
+
+[R] - [Bug: Proactive Reclaim Example Script cannot worked]
+(https://kernel-internals.org/mm/damon/#1-proactive-reclaim-page-out-cold-pages)
