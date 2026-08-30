@@ -18,7 +18,7 @@
         change  = "2026-08-30",
     },
     {
-        name    = "cn-lwn-free-kernel-rss.txt",
+        name    = "cn-lwn-free-kernel-rss",
         title   = "LWN Free Kernel RSS",
         date    = "2026-08-30",
         change  = "2026-08-30",
