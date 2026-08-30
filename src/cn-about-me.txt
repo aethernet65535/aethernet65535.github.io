@@ -1,26 +1,34 @@
-关于我（About Me）
-==================
+关于我
+======
 
 我是一名 Linux 爱好者与贡献者。
 目前主要关注并贡献于 Linux 的 DAMON 子系统 [1]。
 
-主要研究与兴趣（Interests）
----------------------------
+由于我大概率无法为 DAMON 带来什么好机制，所以我现在倾向于先继续修复潜在
+Bug、优化现有代码、完善文档并提升测试覆盖率。
 
-- Linux 内核（Linux Kernel）
-- DAMON 子系统（Data Access MONitoring）
+姓名：刘睿彦 - Liew Rui Yan
+
+主要研究与兴趣
+--------------
+
+- DAMON（Data Access MONitoring）
 - 内存管理（Memory Management）
+- Linux 内核（Linux Kernel）
 
-关于本站（About This Site）
----------------------------
+联系方式
+--------
 
-本站采用简洁的静态模板构建。
-底层框架由梓瑶 [2] 开发，我在此基础上进行了个性配置。
+- 邮件： aethernet65535@gmail.com
+- Telegram：https://t.me/Aether65535
+- GitHub：https://github.com/aethernet65535
 
-联系方式（Contact）
--------------------
+其他
+----
 
-- 邮件: aethernet65535@gmail.com
+- Linux 贡献记录：https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/log/?qt=author&q=Liew+Rui+Yan
+
+引用
+----
 
 [1] https://docs.kernel.org/admin-guide/mm/damon
-[2] https://github.com/ziyao233
