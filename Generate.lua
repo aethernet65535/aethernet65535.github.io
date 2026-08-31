@@ -8,22 +8,22 @@
 	Copyright(c) 2022 Ziyao.All rights reserved.
 ]]
 
-local io		= require("io");
-local string	= require("string");
-local os		= require("os");
-local table		= require("table");
+local io                    = require("io");
+local string                = require("string");
+local os                    = require("os");
+local table                 = require("table");
 
-local modTemplate	= require("Template");
+local modTemplate           = require("Template");
 
-local gListFileName <const>	= "ArticleList.lua";
-local gIndexTplName <const>	= "index.tpl.html";
-local gArtTplName <const>	= "Article.tpl.html";
+local gListFileName <const> = "ArticleList.lua";
+local gIndexTplName <const> = "index.tpl.html";
+local gArtTplName <const>   = "Article.tpl.html";
 local gOutputDir <const>    = "./docs/";
-local gSrcDir <const>		= "./src/";
+local gSrcDir <const>       = "./src/";
 
-local listFile = assert(io.open(gListFileName,"r"),
-			"Cannot open article list file");
-local list = assert(load("return " .. listFile:read("a")))();
+local listFile              = assert(io.open(gListFileName, "r"),
+    "Cannot open article list file");
+local list                  = assert(load("return " .. listFile:read("a")))();
 listFile:close();
 --[[
 	This file should be like:
@@ -45,19 +45,19 @@ local articleTpl = modTemplate.Template(gArtTplName);
 --[[	Spawn the reserved list	and preprocess	]]
 local tmp = {}
 local target = {};
-for _,article in pairs(list)
+for _, article in pairs(list)
 do
-	tmp[article.name] = article;
-	local year, month, day = string.match(article.date,
-					      "(%d%d%d%d)%-(%d%d)%-(%d%d)");
-	year,month,day = tonumber(year), tonumber(month), tonumber(day);
-	article.date = os.time({
-				year	= year,
-				month	= month,
-				day	= day,
-			       });
+    tmp[article.name] = article;
+    local year, month, day = string.match(article.date,
+        "(%d%d%d%d)%-(%d%d)%-(%d%d)");
+    year, month, day = tonumber(year), tonumber(month), tonumber(day);
+    article.date = os.time({
+        year = year,
+        month = month,
+        day = day,
+    });
 
-	table.insert(target, article.name);
+    table.insert(target, article.name);
 end
 local nativeList = list;
 list = tmp;
@@ -66,17 +66,17 @@ tmp = nil;
 --[[	Generate only the specific article	]]
 if arg[1]
 then
-	target = {arg[1]};
+    target = { arg[1] };
 end
 
 --[[	Generate articles	]]
 print("Generating articles");
 print(string.format("%d needs generating",
-		    #target));
-for _,name in pairs(target)
+    #target));
+for _, name in pairs(target)
 do
-	-- Logging
-	io.write(string.format("Generating %s...", name));
+    -- Logging
+    io.write(string.format("Generating %s...", name));
 
     --[[    Instead of md2html, we read the raw text for a "lore.kernel" style    ]]
     local srcPath = string.format("%s%s.txt", gSrcDir, name);
@@ -89,35 +89,35 @@ do
 
     --[[    Template replacement    ]]
     local tplArg = {
-                title       = list[name].title,
-                content     = htmlSrc,
-                date        = list[name].date,
-                change      = list[name].change,
-               };
+        title   = list[name].title,
+        content = htmlSrc,
+        date    = list[name].date,
+        change  = list[name].change,
+    };
 
-	local resultHtml = articleTpl:replace(tplArg);
-	local path = string.format("%s%s.html", gOutputDir,name);
-	local outputFile = io.open(path,"w");
-	assert(outputFile, "Cannot open output file " .. path);
-	outputFile:write(resultHtml);
-	outputFile:close();
+    local resultHtml = articleTpl:replace(tplArg);
+    local path = string.format("%s%s.html", gOutputDir, name);
+    local outputFile = io.open(path, "w");
+    assert(outputFile, "Cannot open output file " .. path);
+    outputFile:write(resultHtml);
+    outputFile:close();
 
-	-- Logging
-	print("Done");
+    -- Logging
+    print("Done");
 
-	list[name].path = path;
+    list[name].path = path;
 end
 
 --[[	Generate the mainpage "index.html"	]]
-table.sort(nativeList,function(a1, a2)
-				return a1.date > a2.date;
-		      end
-	  );
+table.sort(nativeList, function(a1, a2)
+    return a1.date > a2.date;
+end
+);
 
 io.write("Generating index.html...");
-local resultHtml	= indexTpl:replace(nativeList);
-local indexPath		= string.format("%sindex.html",
-					gOutputDir);
-local outputIndex	= io.open(indexPath,"w");
+local resultHtml  = indexTpl:replace(nativeList);
+local indexPath   = string.format("%sindex.html",
+    gOutputDir);
+local outputIndex = io.open(indexPath, "w");
 outputIndex:write(resultHtml);
 print("Done");
