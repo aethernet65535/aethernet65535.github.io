@@ -3,7 +3,7 @@
         name    = "cn-about-me",
         title   = "关于我",
         date    = "2026-03-24",
-        change  = "2026-03-25",
+        change  = "2026-08-30",
     },
     {
         name    = "cn-virtme-ng",
@@ -15,7 +15,7 @@
         name    = "todo",
         title   = "TODO List",
         date    = "2026-08-30",
-        change  = "2026-08-30",
+        change  = "2026-08-31",
     },
     {
         name    = "cn-lwn-free-kernel-rss",
