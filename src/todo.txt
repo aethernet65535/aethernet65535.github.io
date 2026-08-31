@@ -29,7 +29,7 @@ DAMON
 =====
 
 [DONE] - Bug: fix unconditionally skip last region v2
-[R][1] - Test: avoid unconditionally skip last region
+[S][1] - Test: avoid unconditionally skip last region
 
 一个超级难触发、影响超级小的 Bug。然后，还得写一个 KUnit Test，目前只剩
 下 Commit Message 没写而已。
