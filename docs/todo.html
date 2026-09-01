@@ -81,14 +81,14 @@ DAMON
 =====
 
 [DONE] - Bug: fix unconditionally skip last region v2
-[S][1] - Test: avoid unconditionally skip last region
+[R] - Test: avoid unconditionally skip last region
 
-一个超级难触发、影响超级小的 Bug。然后，还得写一个 KUnit Test，目前只剩
-下 Commit Message 没写而已。
+这个不可以拿！因为我要在 Bug 的那个合并到 mm-new 后重新发 KUnit 的补丁，
+主要是为了让 Linux 的 AI 可以给更好的 Review。这个是维护者的建议。
 
 ---
 
-[R][2] - Bug: fix quota could not be set to zero
+[W] - Bug: fix quota could not be set to zero v2
 
 影响较小的 Bug，会导致小量的不必要应用。
 
@@ -101,7 +101,7 @@ DAMON
 
 ---
 
-[W] - Bug: damos_quota_is_full() always return true while esz is zero.
+[W] - Bug: damos_quota_is_full() always return true while esz is zero v2
 
 影响不太小的 Bug，主要是在将 goal_tuner 设置为 temporal 时，如果 goal 被
 满足了，esz 就会变成 0，理论上就不可能有回收了。但是因为这个错误，所以每
