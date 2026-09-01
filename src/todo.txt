@@ -49,7 +49,15 @@ DAMON
 
 ---
 
-[W] - Optimize: use wait_event() replace ctx->pause polling
+[W] - Bug: damos_quota_is_full() always return true while esz is zero.
+
+影响不太小的 Bug，主要是在将 goal_tuner 设置为 temporal 时，如果 goal 被
+满足了，esz 就会变成 0，理论上就不可能有回收了。但是因为这个错误，所以每
+次 DAMON 都会以为配额一直饱满，导致 qt_exceeds 一直涨。
+
+---
+
+[N] - Optimize: use wait_event() replace ctx->pause polling
 
 较小的优化，补丁同样也很小。不过，在发送前，需要先和维护者讨论是否有必要
 做这一改进。
