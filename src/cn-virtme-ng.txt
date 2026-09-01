@@ -1,16 +1,14 @@
 [工具推荐] virtme-ng
 ====================
 
-在做内核开发时，我们常常需要测试自己写的修复是否能够正常运行，但是使用
-QEMU 又需要经过一些复杂的配置才能启动自定义 Linux 内核。
+在做内核开发时，我们常常需要测试自己写的修复是否能够正常运行，但是使用QEMU 又需要经过一些复杂的配置才能启动自定义 Linux 内核。
 
 对于有需要快速编译 + 测试的人来说，可以试试这一款名为 virtme-ng 的工具。
 
 Swap - 交换空间
 ---------------
 
-不知为何，我在 virtme-ng 上无法使用 Swap。我目前的 Workaround 是用 ZRAM
-代替。对比 Swap 的话好设置不少：
+不知为何，我在 virtme-ng 上无法使用 Swap。我目前的 Workaround 是用 ZRAM 代替。对比 Swap 的话好设置不少：
 
     # modprobe zram
     # echo <size> | sudo tee /sys/block/zram0/disksizeA
@@ -24,8 +22,7 @@ Swap - 交换空间
         -> Compressed RAM block device support
         -> zstd compression support (optional)
 
-请确保 Compressed RAM block device support 已经启用，如果有需要的话可以
-顺便启用 zstd compression support。
+请确保 Compressed RAM block device support 已经启用，如果有需要的话可以顺便启用 zstd compression support，zstd 是个快且压缩率不错的压缩算法。
 
 项目相关链接
 ------------
