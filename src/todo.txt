@@ -76,7 +76,7 @@ DAMON Docs
 
 ---
 
-[W] - clarify for qt_exceeds
+[W] - clarify when qt_exceeds increases
 
 解释一些 qt_exceeds 具体会在什么时候才增加，主要是这个条件让我有些困惑，所以还是写写吧，不然有哪个别的笨蛋去烦 SJ 就不好了（虽说我还是觉得这个条件很奇怪，不过，既然没问题，那就先解释就好了）。
 
