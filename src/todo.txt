@@ -105,9 +105,3 @@ DAMON Docs
 讨论后，如果是真的问题，我会修复。
 
 ---
-
-引用
-====
-
-[1] https://github.com/aethernet65535/dotfiles/blob/master/patches/damon/tests/0001-test-for-unconditionally-skipping-the-last-region-v1.patch
-[2] https://github.com/aethernet65535/dotfiles/blob/master/patches/damon/core/0001-fix-quota-could-not-be-set-to-zero-v1.patch
