@@ -83,27 +83,33 @@ DAMON
 
 ---
 
-[W] - Bug: fix quota could not be set to zero v2
+[N] - Optimize: remove unnecessary calculate
 
-影响较小的 Bug，会导致小量的不必要应用。
+在我的 DAMON 使用场景（主动内存回收）中，由于 MemAvailable 大多数时候都是相当充足的，所以基本没有需要 Apply 的情况。但是，DAMON 在一个 Scheme Apply 前，大概率会先去计算一些东西，即使该 Scheme 完全不可能 Apply 任何 Region（因为没有任何必要）。
 
----
-
-[R][3] - Bug: treat zero-region target as invalid target
-
-影响较小的 Bug，会导致不必要的循环检测。本补丁将增加通用的 Invalid 条件，以此避免进入应用检测的循环。
+所以，我会在讨论证明我的优化可以减少不必要的开销后，去和 SJ 讨论是否有必要在现阶段让我来开发这个补丁。
 
 ---
 
-[W] - Bug: damos_quota_is_full() always return true while esz is zero v2
+[N] - Bug: effective size quota stuck
 
-影响不太小的 Bug，主要是在将 goal_tuner 设置为 temporal 时，如果 goal 被满足了，esz 就会变成 0，理论上就不可能有回收了。但是因为这个错误，所以每次 DAMON 都会以为配额一直饱满，导致 qt_exceeds 一直涨。
+目前的代码中，如果本来有设置 Quota，之后很准时地 Unset 了 Quota，那么，Effective Size Quota 会被卡住，进而导致之后不能再调整 Effective Size Quota，也会保留 Quota 的限制，换句话来说就是 Quota 还存在。
+
+我想这大概率是预期之外的行为。不过...先讨论吧，我真怕了。(。﹏。*)
 
 ---
 
 [N] - Optimize: use wait_event() replace ctx-&gt;pause polling
 
-较小的优化，补丁同样也很小。不过，在发送前，需要先和维护者讨论是否有必要做这一改进。
+较小的优化，补丁同样也很小。
+
+不过，在发送前，需要先和维护者讨论是否有必要做这一改进。
+
+---
+
+[N] nr_snapshots 的语义
+
+如果有多个 target，那么 nr_snapshots 是否真的应该增加多次呢？这不仅是文档问题，更是代码问题。
 
 ---
 
@@ -122,9 +128,33 @@ DAMON Docs
 
 ---
 
-[N] nr_snapshots 的语义
+[W] - clarify for qt_exceeds
 
-如果有多个 target，那么 nr_snapshots 是否真的应该增加多次呢？这不仅是文档问题，更是代码问题。
+解释一些 qt_exceeds 具体会在什么时候才增加，主要是这个条件让我有些困惑，所以还是写写吧，不然有哪个别的笨蛋去烦 SJ 就不好了（虽说我还是觉得这个条件很奇怪，不过，既然没问题，那就先解释就好了）。
+
+不过由于现在还有一个 Bug 没讨论是不是预期行为，所以，这个文档修复还不能发。
+
+---
+
+[N] - Bugs: something weird in design doc
+
+目前文档中有个奇怪的地方：
+
+    - ``temporal``: More straightforward algorithm.  Tries to achieve the goal as
+    fast as possible, using maximum allowed quota, but only for a temporal short
+    time.  When the quota is under-achieved, this algorithm keeps tuning quota to
+    a maximum allowed one.  Once the quota is [over]-achieved, this sets the
+    quota zero.  Useful for deterministic control required environments.
+
+重点注意：
+
+    When the quota is under-achieved, this algorithm keeps tuning quota
+    to a maximum allowed one.  Once the quota is [over]-achieved, this
+    sets the quota zero.
+
+我认为开头的 quota 应该都是 goal 才对，可能是 typo 之类的。
+
+讨论后，如果是真的问题，我会修复。
 
 ---
 
@@ -133,12 +163,11 @@ DAMON Docs
 
 [1] https://github.com/aethernet65535/dotfiles/blob/master/patches/damon/tests/0001-test-for-unconditionally-skipping-the-last-region-v1.patch
 [2] https://github.com/aethernet65535/dotfiles/blob/master/patches/damon/core/0001-fix-quota-could-not-be-set-to-zero-v1.patch
-[3] https://github.com/aethernet65535/dotfiles/blob/master/patches/damon/core/0001-invalid-zero-region-target-rfc-v1.patch
 </code></pre>
         <hr>
         <div style="text-align: left">
 <pre><code class="language-text">Publish: 2026-08-30
-Last Change: 2026-09-01</code></pre>
+Last Change: 2026-09-07</code></pre>
         </div>
 
         <div style="text-align: left">
