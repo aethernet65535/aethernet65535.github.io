@@ -93,7 +93,6 @@ DAMON
 
 ---
 
-[N] - Optimize: use wait_event() replace ctx-&gt;pause polling
 [N] - 优化：使用 wait_event() 替代 ctx-&gt;pause 的轮询
 
 影响：导致不必要的耗电。
@@ -106,6 +105,14 @@ DAMON
 影响：导致用户困惑。
 问题：如果有过个 Target 的话，那么 nr_snapshots 是否真的应该增加多次呢？
 目前的文档并没有说明这是否是预期行为，需要向 SJ 确认。
+
+---
+
+[PROB WONT DO] - 优化: 永远优先回收权重最高的 Region
+
+影响：不是问题，但是 Sounds Pretty Sick！ヾ(≧▽≦*)o
+描述：DAMON 目前会在 damos_adjust_quota() 时用 Histogram 计算 quota-&gt;min_score，主要是为了让 DAMOS Scheme 可以尽量先回收权重比较高的那些 Regions。不过，quota-&gt;min_score 并不是严格地优先回收权重最高的 Region。所以，如果让这个 Histrogram 只计算出最高的那个 Score，完全不管 Region-Size，弄成一个可选项，会不会很好呢嘛不过，我想不到什么场景会需要这种东西，只能说是 Hacker 的玩具选项而已。
+其他：等我想到有用的场景了才可以讨论 (=′ー`)...  
 
 ---
 
