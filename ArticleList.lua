@@ -15,7 +15,7 @@
         name    = "todo",
         title   = "TODO List",
         date    = "2026-08-30",
-        change  = "2026-09-07",
+        change  = "2026-09-09",
     },
     {
         name    = "cn-lwn-free-kernel-rss",
