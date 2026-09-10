@@ -23,4 +23,10 @@
         date    = "2026-08-30",
         change  = "2026-08-30",
     },
+    {
+        name    = "cn-what-to-do-before-submit-patches",
+        title   = "提交补丁前要做什么？",
+        date    = "2026-09-10",
+        change  = "2026-09-10",
+    },
 }
