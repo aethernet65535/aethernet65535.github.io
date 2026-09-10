@@ -60,24 +60,20 @@
 怎么看？
 =======
 
-[Z] - 进度零
-[W] - 开发中
-[S] - 已发送
-[D] - 讨论中
-[R] - 待发送
-[N] - 不开始/待讨论
+[Z] - 未讨论成功（也可以是“正在讨论”的意思）
+[W] - 已讨论/开发中
+[M] - 待合并
 
 做好的去哪了？
 --------------
 
 做好了自然没必要留在 TODO List 啦！ o(*≧▽≦)ツ
-不过我也有可能会写 [DONE]，只要不是单字母的，我一般都是会写一整个单词的。
 
 DAMON
 =====
 
-[DONE] - Bug: 修复无条件跳过 Last region (v2)
-[R][1] - Test: 防止对应 Bug 的回归
+[M] - Bug: 修复无条件跳过 Last region (v2)
+[RESEND WAITING][1] - Test: 防止对应 Bug 的回归
 
 影响：导致不必要的跳过。
 问题：这是一个触发概率极低的 Bug。偶尔会导致最后一个 Region 被无条件的跳过，而不会被 Apply。
@@ -85,7 +81,7 @@ DAMON
 
 ---
 
-[N] - 优化：防止不必要计算
+[Z] - 优化：防止不必要计算
 
 影响：导致不必要的开销。
 问题：没必要 Apply 时，DAMON 也会给 DAMOS Scheme 做一些计算（damos_adjust_quota() 的处理 + 计算）[2]。
@@ -93,14 +89,14 @@ DAMON
 
 ---
 
-[N] - 优化：使用 wait_event() 替代 ctx-&gt;pause 的轮询
+[Z] - 优化：使用 wait_event() 替代 ctx-&gt;pause 的轮询
 
 影响：导致不必要的耗电。
 问题：目前的 ctx-&gt;pause 被设置后，DAMON 内核线程（kdamond）还是会继续轮询。这可能导致电池有限的设备（如安卓移动设备）不能进入深度睡眠模式。
 
 ---
 
-[N] - nr_snapshots 的语义
+[Z] - nr_snapshots 的语义
 
 影响：导致用户困惑。
 问题：如果有过个 Target 的话，那么 nr_snapshots 是否真的应该增加多次呢？
@@ -108,11 +104,11 @@ DAMON
 
 ---
 
-[PROB WONT DO] - 优化: 永远优先回收权重最高的 Region
+[Z(PROB WONT DO)] - 优化: 永远优先回收权重最高的 Region
 
-影响：不是问题，但是 Sounds Pretty Sick！ヾ(≧▽≦*)o
+影响：不是问题，But Sounds Pretty Sick！ヾ(≧▽≦*)o
 描述：DAMON 目前会在 damos_adjust_quota() 时用 Histogram 计算 quota-&gt;min_score，主要是为了让 DAMOS Scheme 可以尽量先回收权重比较高的那些 Regions。不过，quota-&gt;min_score 并不是严格地优先回收权重最高的 Region。所以，如果让这个 Histrogram 只计算出最高的那个 Score，完全不管 Region-Size，弄成一个可选项，会不会很好呢嘛不过，我想不到什么场景会需要这种东西，只能说是 Hacker 的玩具选项而已。
-其他：等我想到有用的场景了才可以讨论 (=′ー`)...  
+其他：等我想到有用的场景了才可以讨论 (=′ー`)...目前的话，还停留在 Pretty Sick 阶段。虽说这会导致 charge_sz 大部分时候不能接近 esz，不过这可能问题也不是很大。这可能是确定性和吞吐量的取舍。
 
 ---
 
@@ -135,7 +131,7 @@ DAMON Docs
 
 ---
 
-[N] - Bugs: something weird in design doc
+[W] - Bugs: something weird in design doc
 
 影响：几乎没有影响，英语好的可以感觉到真正的意思，不好的估计也会自己去问 AI。
 问题：目前文档中有个奇怪的地方：
@@ -156,7 +152,7 @@ DAMON Docs
         <hr>
         <div style="text-align: left">
 <pre><code class="language-text">Publish: 2026-08-30
-Last Change: 2026-09-09</code></pre>
+Last Change: 2026-09-10</code></pre>
         </div>
 
         <div style="text-align: left">
