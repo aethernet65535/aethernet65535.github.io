@@ -58,9 +58,8 @@
 怎么看？
 =======
 
-[Z] - 未讨论成功（也可以是“正在讨论”的意思）
-[W] - 已讨论/开发中
-[M] - 待合并
+[Z] - 未讨论成功
+[W] - 已讨论成功
 
 做好的去哪了？
 --------------
@@ -70,7 +69,7 @@
 DAMON
 =====
 
-[M] - Bug: 修复无条件跳过 Last region (v2)
+[DONE] - Bug: 修复无条件跳过 Last region (v2)
 [RESEND WAITING][1] - Test: 防止对应 Bug 的回归
 
 影响：导致不必要的跳过。
@@ -79,11 +78,13 @@ DAMON
 
 ---
 
-[Z] - 优化：防止不必要计算
+[Z(PROB WONT DO)] - 优化：防止不必要计算
 
 影响：导致不必要的开销。
 问题：没必要 Apply 时，DAMON 也会给 DAMOS Scheme 做一些计算（damos_adjust_quota() 的处理 + 计算）[2]。
 其他：在我的 DAMON 使用场景（主动内存回收）中，由于 MemAvailable 大多数都是相当充足的，所以大部分时间是没有必要去计算这些东西的，所以可能会造成一些没有必要的性能开销。所以，我会在讨论证明我的优化可以减少不必要的开销后，去和 SJ 讨论是否有必要在现阶段让我来开发这个补丁。
+
+结果：不知为何，即使指令数减少了，Task-Clock 和 Cycles 还是没有减少，反而增加了。可能是我的测试方法（virtme-ng + perf）有问题。
 
 ---
 
@@ -92,13 +93,14 @@ DAMON
 影响：导致不必要的耗电。
 问题：目前的 ctx-&gt;pause 被设置后，DAMON 内核线程（kdamond）还是会继续轮询。这可能导致电池有限的设备（如安卓移动设备）不能进入深度睡眠模式。
 
+待办：功能正常后，测试是否降低了开销。
+
 ---
 
 [Z] - nr_snapshots 的语义
 
 影响：导致用户困惑。
-问题：如果有过个 Target 的话，那么 nr_snapshots 是否真的应该增加多次呢？
-目前的文档并没有说明这是否是预期行为，需要向 SJ 确认。
+问题：如果有过个 Target 的话，那么 nr_snapshots 是否真的应该增加多次呢？目前的文档并没有说明这是否是预期行为。
 
 ---
 
@@ -121,23 +123,7 @@ DAMON Docs
 
 ---
 
-[W] - clarify when qt_exceeds increases
-
-影响：导致用户困惑。
-问题：用户可能因 qt_exceeds 奇怪的增加条件而感到困惑。鉴于这个增加条件并没有造成任何实际影响，所以先使用文档声明这一行为，而不是修改这一行为。
-其他：Quota 设置为 0 时，DAMON 也在窗口结束时将 Quota 使用量判断为满，因为 0 &gt;= 0。DAMON，很神奇吧？ヽ(✿ﾟ▽ﾟ)ノ
-
----
-
-[W] - Bugs: something weird in design doc
-
-影响：几乎没有影响，英语好的可以感觉到真正的意思，不好的估计也会自己去问 AI。
-问题：目前文档中有个奇怪的地方：
-
-- ``temporal``: More straightforward algorithm.  Tries to achieve the goal as fast as possible, using maximum allowed quota, but only for a temporal short time.  --&gt; When the quota is under-achieved, this algorithm keeps tuning quota to a maximum allowed one.  Once the quota is [over]-achieved &lt;--, this sets the quota zero.  Useful for deterministic control required environments.
-
-其他：我认为开头的 Quota 应该都是 Goal 才对，可能是 Typo 之类的。确认后
-我会修复。
+[ 全修好了 ]
 
 ---
 
