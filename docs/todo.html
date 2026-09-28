@@ -69,23 +69,6 @@
 DAMON
 =====
 
-[DONE] - Bug: 修复无条件跳过 Last region (v2)
-[RESEND WAITING][1] - Test: 防止对应 Bug 的回归
-
-影响：导致不必要的跳过。
-问题：这是一个触发概率极低的 Bug。偶尔会导致最后一个 Region 被无条件的跳过，而不会被 Apply。
-其他：不能拿了！因为我得在 Bug 修复的那个补丁被合并到 mm-new 后，再重新发 KUnit 的补丁。主要是为了让 Linux 的 AI（Sashiko）可以给更好地 Review。这个是 SJ（维护者）的建议。
-
----
-
-[Z] - 优化：使用 wait_event() 替代 ctx-&gt;pause 的轮询
-
-影响：导致不必要的耗电。
-问题：目前的 ctx-&gt;pause 被设置后，DAMON 内核线程（kdamond）还是会继续轮询。这可能导致电池有限的设备（如安卓移动设备）不能进入深度睡眠模式。
-
-待办：功能正常后，测试是否降低了开销。
-
----
 
 [Z] - nr_snapshots 的语义
 
@@ -126,7 +109,7 @@ DAMON Docs
         <hr>
         <div style="text-align: left">
 <pre><code class="language-text">Publish: 2026-08-30
-Last Change: 2026-09-17</code></pre>
+Last Change: 2026-09-29</code></pre>
         </div>
 
         <div style="text-align: left">
