@@ -14,16 +14,8 @@ TODO List
 
 做好了自然没必要留在 TODO List 啦！ o(*≧▽≦)ツ
 
-DAMON
-=====
-
-
-[Z] - nr_snapshots 的语义
-
-影响：导致用户困惑。
-问题：如果有过个 Target 的话，那么 nr_snapshots 是否真的应该增加多次呢？目前的文档并没有说明这是否是预期行为。
-
----
+DAMON RFC
+=========
 
 [Z(PROB WONT DO)] - 优化: 永远优先回收权重最高的 Region
 
@@ -33,14 +25,31 @@ DAMON
 
 ---
 
+[Z] - PERF/AMD/IBS：预期之外的没有采样结果
+
+影响：较大。
+描述：在使用一个 RFC 补丁系列 [1] 时，不知为何，运行一段时间后 DAMON 中所有 Regions 的访问次数就会变成 0（Probe [2] 的，不是 nr_accesses），实测甚至可以连续 6 小时。
+其他：我不知道是怎么触发的，我也很难证明是 IBS 的问题还是 DAMON 的问题，因为我没有办法稳定复现。最大的原因是我对 CPU 真的很不熟悉 (=′ー`)。
+
+
+DAMON
+=====
+
+[Z] - DAMO：添加 Probe [2] 的支持
+
+影响：对大部分人来说，不大；对我，很大。
+描述：随着 DAMON 引入了 Probe / Data Attributes Monitoring，用户可以完全
+不用 Legacy 的 nr_accesses 来合并 Regions 了。但是 DAMO 目前还是只能显示
+nr_accesses 的访问频率（Hz），不能显示 Probe 的。
+
+---
+
+[ 还没有 ]
+
+---
+
 DAMON Docs
 ==========
-
-大部分过小的错误我并不会修正，这些让其他的新手来修会更加好，让更多人能接触 Linux。(๑•̀ㅂ•́)و✧
-
-不过，一些简单的解释修正/添加我依旧会做，即使那些也是新人入门的好方式，但是没有这些解释可能导致读者对其的理解错误。
-
-还有就是，本页面的所有 TODO 都是我会修的，我目前没有打算找错误然后专门给其他人修的打算。(｡･∀･)ﾉﾞ
 
 ---
 
@@ -51,5 +60,5 @@ DAMON Docs
 引用
 ====
 
-[1] https://lore.kernel.org/damon/20260831113735.3349-1-aethernet65535@gmail.com
-[2] https://elixir.bootlin.com/linux/v7.3-rc1/source/mm/damon/core.c#L3138
+[1] https://lore.kernel.org/damon/20261005-damon-perf-rfc-v3-send-2026-10-03-v4-0-b03452e137f3@gmail.com
+[2] https://docs.kernel.org/mm/damon/design.html#damon-design-data-attrs-monitoring
