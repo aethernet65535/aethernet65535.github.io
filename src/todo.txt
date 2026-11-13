@@ -14,24 +14,6 @@ TODO List
 
 做好了自然没必要留在 TODO List 啦！ o(*≧▽≦)ツ
 
-DAMON RFC
-=========
-
-[Z(PROB WONT DO)] - 优化: 永远优先回收权重最高的 Region
-
-影响：不是问题，But Sounds Pretty Sick！ヾ(≧▽≦*)o
-描述：DAMON 目前会在 damos_adjust_quota() 时用 Histogram 计算 quota->min_score，主要是为了让 DAMOS Scheme 可以尽量先回收权重比较高的那些 Regions。不过，quota->min_score 并不是严格地优先回收权重最高的 Region。所以，如果让这个 Histrogram 只计算出最高的那个 Score，完全不管 Region-Size，弄成一个可选项，会不会很好呢嘛不过，我想不到什么场景会需要这种东西，只能说是 Hacker 的玩具选项而已。
-其他：等我想到有用的场景了才可以讨论 (=′ー`)...目前的话，还停留在 Pretty Sick 阶段。虽说这会导致 charge_sz 大部分时候不能接近 esz，不过这可能问题也不是很大。这可能是确定性和吞吐量的取舍。
-
----
-
-[Z] - PERF/AMD/IBS：预期之外的没有采样结果
-
-影响：较大。
-描述：在使用一个 RFC 补丁系列 [1] 时，不知为何，运行一段时间后 DAMON 中所有 Regions 的访问次数就会变成 0（Probe [2] 的，不是 nr_accesses），实测甚至可以连续 6 小时。
-其他：我不知道是怎么触发的，我也很难证明是 IBS 的问题还是 DAMON 的问题，因为我没有办法稳定复现。最大的原因是我对 CPU 真的很不熟悉 (=′ー`)。
-
-
 DAMON
 =====
 
@@ -41,12 +23,6 @@ DAMON
 描述：随着 DAMON 引入了 Probe / Data Attributes Monitoring，用户可以完全
 不用 Legacy 的 nr_accesses 来合并 Regions 了。但是 DAMO 目前还是只能显示
 nr_accesses 的访问频率（Hz），不能显示 Probe 的。
-
----
-
-[ 还没有 ]
-
----
 
 DAMON Docs
 ==========
